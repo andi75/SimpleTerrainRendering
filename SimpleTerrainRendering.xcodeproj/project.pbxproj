@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F730AB021C26E0DF0035F2E9 /* SimpleTerrainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */; };
 		F7DD22211C26BE390082EA63 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DD22201C26BE390082EA63 /* AppDelegate.swift */; };
 		F7DD22231C26BE390082EA63 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DD22221C26BE390082EA63 /* ViewController.swift */; };
 		F7DD22261C26BE390082EA63 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7DD22241C26BE390082EA63 /* Main.storyboard */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleTerrainView.swift; sourceTree = "<group>"; };
 		F7DD221D1C26BE390082EA63 /* SimpleTerrainRendering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimpleTerrainRendering.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7DD22201C26BE390082EA63 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F7DD22221C26BE390082EA63 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -63,6 +65,7 @@
 				F7DD22271C26BE390082EA63 /* Assets.xcassets */,
 				F7DD22291C26BE390082EA63 /* LaunchScreen.storyboard */,
 				F7DD222C1C26BE390082EA63 /* Info.plist */,
+				F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */,
 			);
 			path = SimpleTerrainRendering;
 			sourceTree = "<group>";
@@ -138,6 +141,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F730AB021C26E0DF0035F2E9 /* SimpleTerrainView.swift in Sources */,
 				F7DD22231C26BE390082EA63 /* ViewController.swift in Sources */,
 				F7DD22331C26BE740082EA63 /* TerrainData.swift in Sources */,
 				F7DD22211C26BE390082EA63 /* AppDelegate.swift in Sources */,
@@ -290,6 +294,7 @@
 				F7DD22311C26BE390082EA63 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

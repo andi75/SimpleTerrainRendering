@@ -10,10 +10,14 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var terrainView: SimpleTerrainView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         var terrain = TerrainData(width: 4, height: 4)
-        terrain.randomize(min: 5, max: 10)
+        // terrain.randomize(min: 5, max: 10)
+        terrainView!.context = EAGLContext(API: .OpenGLES1)
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
 
