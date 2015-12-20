@@ -12,6 +12,8 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        var terrain = TerrainData(width: 4, height: 4)
+        terrain.randomize(min: 5, max: 10)
         // Do any additional setup after loading the view, typically from a nib.
     }
 
