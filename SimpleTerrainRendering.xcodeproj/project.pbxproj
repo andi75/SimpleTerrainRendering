@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E166887C1C2967E400B7C336 /* TerrainCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = E166887B1C2967E400B7C336 /* TerrainCamera.swift */; };
 		F730AB021C26E0DF0035F2E9 /* SimpleTerrainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */; };
 		F7DD22211C26BE390082EA63 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DD22201C26BE390082EA63 /* AppDelegate.swift */; };
 		F7DD22231C26BE390082EA63 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DD22221C26BE390082EA63 /* ViewController.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E166887B1C2967E400B7C336 /* TerrainCamera.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerrainCamera.swift; sourceTree = "<group>"; };
 		F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleTerrainView.swift; sourceTree = "<group>"; };
 		F7DD221D1C26BE390082EA63 /* SimpleTerrainRendering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimpleTerrainRendering.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7DD22201C26BE390082EA63 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 				F7DD22291C26BE390082EA63 /* LaunchScreen.storyboard */,
 				F7DD222C1C26BE390082EA63 /* Info.plist */,
 				F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */,
+				E166887B1C2967E400B7C336 /* TerrainCamera.swift */,
 			);
 			path = SimpleTerrainRendering;
 			sourceTree = "<group>";
@@ -144,6 +147,7 @@
 				F730AB021C26E0DF0035F2E9 /* SimpleTerrainView.swift in Sources */,
 				F7DD22231C26BE390082EA63 /* ViewController.swift in Sources */,
 				F7DD22331C26BE740082EA63 /* TerrainData.swift in Sources */,
+				E166887C1C2967E400B7C336 /* TerrainCamera.swift in Sources */,
 				F7DD22211C26BE390082EA63 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
