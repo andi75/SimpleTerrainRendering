@@ -6,6 +6,7 @@
 //  Copyright © 2015 Andreas Umbach. All rights reserved.
 //
 
+import Swift
 import UIKit
 import GLKit
 
@@ -13,10 +14,13 @@ class SimpleTerrainView : GLKView
 {
     var data : TerrainData? = nil
     
-    var min : Float = 0
-    var max : Float = 1
+    var hmin : Float = 0
+    var hmax : Float = 1
     
-    var distance : Float = 1.0
+    var distance : Float = 0.25
+    
+    var isWireframe = false
+    var triangulationType = 0
     
     override func drawRect(rect: CGRect) {
         print("drawRect called")
@@ -47,29 +51,43 @@ class SimpleTerrainView : GLKView
         // let proj = GLKMatrix4MakeOrtho(0, Float(terrain.width), 0, Float(terrain.height), 0, 100)
         let d = distance * Float(terrain.width)
         
-        let proj = GLKMatrix4MakeOrtho(-d, d, -d, d, 0, 4 * d)
+        // let proj = GLKMatrix4MakeOrtho(-d, d, -d, d, 0, 4 * d)
+        let proj = GLKMatrix4MakePerspective(Float(M_PI) / 3, 1.0, 1.0, 4 * d)
         glLoadMatrixf(glMatrix(proj))
         
         glMatrixMode(GLenum(GL_MODELVIEW))
-        let cam = GLKMatrix4MakeLookAt(d/2, d/2, d, 0, 0, 0, 0, 0, 1)
+        
+        print("eye position: (\(d/2), \(d/2), \(d))");
+        let cam = GLKMatrix4MakeLookAt(
+            d, d, d,
+            // 0, 0, 0,
+            Float(terrain.width) / 2, Float(terrain.height) / 2, 0,
+            0, 0, 1)
         glLoadIdentity()
+        
+        let lightpos : [Float] = [ 0, 0, 1, 0 ]
+        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_POSITION), lightpos)
+
         glLoadMatrixf(glMatrix(cam))
+
+ 
         // simpleTriangle()
         terrainGeometry(terrain)
     }
     
     func terrainGeometry(terrain: TerrainData)
     {
-        let wireframe = true
-
+        
         let vertexCount = terrain.width * terrain.height
-        let primitiveCount = wireframe ?
+        let primitiveCount = self.isWireframe ?
             (terrain.width - 1) * (terrain.height - 1) * 5 :
             (terrain.width - 1) * (terrain.height - 1) * 2
         
-        let indicesPerPrimitive = wireframe ? 2 : 3
+        let indicesPerPrimitive = self.isWireframe ? 2 : 3
         
         var vertices : [Float] = [Float](count: vertexCount * 3, repeatedValue: 0.0)
+        var normals : [Float] = [Float](count: vertexCount * 3, repeatedValue: 0.0)
+        var normalColors : [Float] = [Float](count: vertexCount * 8, repeatedValue: 0.0)
         var colors : [Float] = [Float](count: vertexCount * 4, repeatedValue: 0.0)
         
         var indices : [UInt32] = [UInt32](count: primitiveCount * indicesPerPrimitive, repeatedValue: 0)
@@ -84,10 +102,32 @@ class SimpleTerrainView : GLKView
                 vertices[3 * vertex + 0] = Float(x)
                 vertices[3 * vertex + 1] = Float(y)
                 vertices[3 * vertex + 2] = terrain.data[vertex]
+                
+                // normals
+                let prefx = max(0, x - 1)
+                let postx = min(x + 1, terrain.width - 1)
+                let prefy = max(0, y - 1)
+                let posty = min(y + 1, terrain.height - 1)
+                
+                let vprex = (y * terrain.width + prefx)
+                let vpostx = (y * terrain.width + postx)
+                let vprey = (prefy * terrain.width + x)
+                let vposty = (posty * terrain.width + x)
+                let vdx = GLKVector3(v: (2, 0, terrain.data[vpostx] - terrain.data[vprex]) )
+                let vdy = GLKVector3(v: (0, 2, terrain.data[vposty] - terrain.data[vprey]) )
+                let vTemp = GLKVector3CrossProduct(vdx, vdy)
+                let vNormal = GLKVector3Normalize(vTemp)
+                
+                normals[3 * vertex + 0] = vNormal.x
+                normals[3 * vertex + 1] = vNormal.y
+                normals[3 * vertex + 2] = vNormal.z
     
-                colors[4 * vertex + 0] = (terrain.data[vertex] - min) / (max - min)
-                colors[4 * vertex + 1] = (terrain.data[vertex] - min) / (max - min)
-                colors[4 * vertex + 2] = (terrain.data[vertex] - min) / (max - min)
+                let base : Float = 0.2
+                let terrainValue : Float = (terrain.data[vertex] - hmin) / (hmax - hmin)
+                colors[4 * vertex + 0] = Float(x) / Float(terrain.width) // base + (1 - base) * terrainValue
+                colors[4 * vertex + 1] = Float(y) / Float(terrain.height) // base + (1 - base) * terrainValue
+                colors[4 * vertex + 2] = 1 // base + (1 - base) * terrainValue
+                
                 colors[4 * vertex + 3] = 1
             }
         }
@@ -121,52 +161,68 @@ class SimpleTerrainView : GLKView
                 let d14 = abs(vertices[3 * Int(v1) + 2] - vertices[3 * Int(v4) + 2])
                 let d23 = abs(vertices[3 * Int(v2) + 2] - vertices[3 * Int(v3) + 2])
                 
-                let wireframe1 =
+                let wireframe2 =
                     (d14 < d23) ?
 
                     // ((x + y) % 2 == 0) ?
                     [ v1, v2, v1, v3, v2, v4, v3, v4, v1, v4 ]  :
                     [ v1, v2, v1, v3, v2, v4, v3, v4, v2, v3 ];
                 
-                if(wireframe)
+                let wireframe1 = ((x + y) % 2 == 0) ?
+                    [ v1, v2, v1, v3, v2, v4, v3, v4, v1, v4 ]  :
+                    [ v1, v2, v1, v3, v2, v4, v3, v4, v2, v3 ];
+                
+                let wireframe0 = [ v1, v2, v1, v3, v2, v4, v3, v4, v1, v4 ];
+                
+                let solid2 = (d14 < d23) ?
+                    [ v1, v2, v3, v2, v4, v3 ] :
+                    [ v1, v2, v4, v1, v4, v3 ];
+                
+                let solid1 = ((x + y) % 2 == 0) ?
+                    [ v1, v2, v3, v2, v4, v3 ] :
+                    [ v1, v2, v4, v1, v4, v3 ];
+                
+                let solid0 = [ v1, v2, v3, v2, v4, v3 ]
+                
+                var wireframe : [UInt32]
+                var solid : [UInt32]
+                
+                switch(self.triangulationType)
+                {
+                case 0:
+                    wireframe = wireframe0
+                    solid = solid0
+                case 1:
+                    wireframe = wireframe1
+                    solid = solid1
+                case 2:
+                    wireframe = wireframe2
+                    solid = solid2
+                default:
+                    wireframe = wireframe0
+                    solid = solid0
+                    print("not supposed to happen")
+                }
+                
+                if(self.isWireframe)
                 {
                     
                     for(var i = 0; i < 5; i++)
                     {
                         for(var j = 0; j < 2; j++)
                         {
-                            indices[2 * triangle + j] = wireframe1[2 * i + j];
+                            indices[2 * triangle + j] = wireframe[2 * i + j];
                         }
                         triangle++;
                     }
                 }
                 else
                 {
-                    if (d14 < d23)
-                        // ( (x + y) % 2 == 0)
+                    for(var i = 0; i < 6; i++)
                     {
-                        indices[3 * triangle + 0] = v1;
-                        indices[3 * triangle + 1] = v2;
-                        indices[3 * triangle + 2] = v3;
-                        triangle++;
-                        
-                        indices[3 * triangle + 0] = v2;
-                        indices[3 * triangle + 1] = v4;
-                        indices[3 * triangle + 2] = v3;
-                        triangle++;
+                        indices[3 * triangle + i] = solid[i];
                     }
-                    else
-                    {
-                        indices[3 * triangle + 0] = v1;
-                        indices[3 * triangle + 1] = v4;
-                        indices[3 * triangle + 2] = v2;
-                        triangle++;
-                        
-                        indices[3 * triangle + 0] = v1;
-                        indices[3 * triangle + 1] = v3;
-                        indices[3 * triangle + 2] = v4;
-                        triangle++;
-                    }
+                    triangle += 2;
                 }
             }
         }
@@ -174,12 +230,58 @@ class SimpleTerrainView : GLKView
 //        print("vertices: \(vertices)")
 //        print("colors: \(colors)")
         
+        let normalVertexcount = 2 * vertexCount
+        var normalVertices : [Float] = [Float](count: normalVertexcount * 3, repeatedValue: 0.0)
+        for(var i = 0; i < vertexCount; i++)
+        {
+            normalVertices[6 * i + 0] = vertices[3 * i + 0];
+            normalVertices[6 * i + 1] = vertices[3 * i + 1];
+            normalVertices[6 * i + 2] = vertices[3 * i + 2];
+            normalVertices[6 * i + 3] = vertices[3 * i + 0] + normals[3 * i + 0];
+            normalVertices[6 * i + 4] = vertices[3 * i + 1] + normals[3 * i + 1];
+            normalVertices[6 * i + 5] = vertices[3 * i + 2] + normals[3 * i + 2];
+            
+            normalColors[8 * i + 0] = 1.0;
+            normalColors[8 * i + 1] = 0.0;
+            normalColors[8 * i + 2] = 0.0;
+            normalColors[8 * i + 3] = 1.0;
+            
+            normalColors[8 * i + 4] = 1.0;
+            normalColors[8 * i + 5] = 1.0;
+            normalColors[8 * i + 6] = 0.0;
+            normalColors[8 * i + 7] = 1.0;
+        }
+        
+        
         glVertexPointer(3, GLenum(GL_FLOAT), 0, vertices)
         glColorPointer(4, GLenum(GL_FLOAT), 0, colors)
+        glNormalPointer(GLenum(GL_FLOAT), 0, normals)
         glEnableClientState(GLenum(GL_VERTEX_ARRAY))
         glEnableClientState(GLenum(GL_COLOR_ARRAY))
+        glEnableClientState(GLenum(GL_NORMAL_ARRAY))
         
-        if(wireframe)
+        let light0diffuse : [Float] = [ 1, 1, 1, 1 ]
+        let light0ambient : [Float] = [ 0, 0, 0, 1 ]
+        let light0specular : [Float] = [ 0, 0, 0, 1 ]
+        
+        glEnable( GLenum(GL_LIGHT0) )
+        glEnable( GLenum(GL_LIGHTING) )
+        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_DIFFUSE), light0diffuse)
+        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_AMBIENT), light0ambient)
+        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_SPECULAR), light0specular)
+        
+        glEnable( GLenum(GL_RESCALE_NORMAL ) )
+
+
+        glCullFace( GLenum(GL_BACK) )
+        glEnable( GLenum(GL_CULL_FACE) )
+        
+        // default behaviour in OpenGL ES
+        // glColorMaterial( GLenum(GL_FRONT), GLenum(GL_AMBIENT_AND_DIFFUSE) )
+        glEnable( GLenum(GL_COLOR_MATERIAL) )
+        
+        
+        if(self.isWireframe)
         {
             glDrawElements(GLenum(GL_LINES), GLsizei(2 * triangle), GLenum(GL_UNSIGNED_INT), indices)
         }
@@ -187,9 +289,24 @@ class SimpleTerrainView : GLKView
         {
             glDrawElements(GLenum(GL_TRIANGLES), GLsizei(3 * triangle), GLenum(GL_UNSIGNED_INT), indices)
         }
+        glDisableClientState(GLenum(GL_NORMAL_ARRAY))
         glDisableClientState(GLenum(GL_COLOR_ARRAY))
         glDisableClientState(GLenum(GL_VERTEX_ARRAY))
         
+        glDisable( GLenum(GL_LIGHT0) )
+        glDisable( GLenum(GL_LIGHTING) )
+        
+        // draw normals
+        // glColor4f(1.0, 0.0, 0.0, 1.0)
+        
+        glVertexPointer(3, GLenum(GL_FLOAT), 0, normalVertices)
+        glColorPointer(4, GLenum(GL_FLOAT), 0, normalColors)
+        glEnableClientState(GLenum(GL_VERTEX_ARRAY))
+        glEnableClientState(GLenum(GL_COLOR_ARRAY))
+        // glDrawArrays(GLenum(GL_LINES), 0, GLsizei(normalVertexcount))
+        glDisableClientState(GLenum(GL_COLOR_ARRAY))
+        glDisableClientState(GLenum(GL_VERTEX_ARRAY))
+
     }
     func simpleTriangle()
     {

@@ -15,20 +15,26 @@ class ViewController: UIViewController {
     @IBOutlet var singleTap: UITapGestureRecognizer!
     @IBOutlet var doubleTap: UITapGestureRecognizer!
     
+    @IBOutlet weak var solidWireFrameSwitch: UISwitch!
+    @IBOutlet weak var triangulationTypeSegementedControl: UISegmentedControl!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         var terrain = TerrainData(width: 128, height: 128)
-        terrain.randomize(min: 0, max: 5)
+        terrain.randomize(min: 0, max: 15)
+        terrain.smooth()
         
         terrainView!.context = EAGLContext(API: .OpenGLES1)
         terrainView!.data = terrain
-        terrainView.max = 5;
-        terrainView.min = 0;
+        terrainView.hmax = 8;
+        terrainView.hmin = 2;
         
         singleTap.delaysTouchesBegan = true
         doubleTap.delaysTouchesBegan = true
         singleTap.requireGestureRecognizerToFail(doubleTap)
+        
+        self.solidWireFrameSwitch?.on = terrainView.isWireframe
+        self.triangulationTypeSegementedControl?.selectedSegmentIndex = terrainView.triangulationType
     }
 
     override func didReceiveMemoryWarning() {
@@ -43,7 +49,8 @@ class ViewController: UIViewController {
     }
     
     @IBAction func viewDoubletapped(sender: UITapGestureRecognizer) {
-        terrainView.data?.randomize(min: 0, max: 5)
+        terrainView.data?.randomize(min: 0, max: 15)
+        terrainView.data?.smooth()
         terrainView.setNeedsDisplay()
         print("randomized")
     }
@@ -65,5 +72,13 @@ class ViewController: UIViewController {
         }
     }
 
+    @IBAction func solidWireFrameSwitched(sender: UISwitch) {
+        self.terrainView.isWireframe = sender.on
+        self.terrainView.setNeedsDisplay()
+    }
+    @IBAction func triangulationTypeChanged(sender: UISegmentedControl) {
+        self.terrainView.triangulationType = sender.selectedSegmentIndex
+        self.terrainView.setNeedsDisplay()
+    }
 }
 

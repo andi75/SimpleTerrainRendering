@@ -58,7 +58,7 @@ class TerrainData
     {
         for var i = 0; i < self.data.count; i++ {
             self.data[i] = min + (max - min) * (Float(random()) / Float(RAND_MAX))
-            print(data[i])
+            // print(data[i])
         }
     }
     

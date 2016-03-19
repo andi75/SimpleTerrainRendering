@@ -31,19 +31,83 @@
                                     <outletCollection property="gestureRecognizers" destination="Gqa-D5-FtA" appends="YES" id="aFM-dP-zZJ"/>
                                 </connections>
                             </glkView>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7nP-6S-Iq8">
+                                <rect key="frame" x="-25" y="-15" width="51" height="31"/>
+                                <connections>
+                                    <action selector="solidWireFrameSwitched:" destination="BYZ-38-t0r" eventType="valueChanged" id="y6J-RH-1T5"/>
+                                </connections>
+                            </switch>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="QyU-DE-xiM">
+                                <rect key="frame" x="-60" y="-14" width="121" height="29"/>
+                                <segments>
+                                    <segment title="Uniform"/>
+                                    <segment title="Alternating"/>
+                                    <segment title="Min. Delta z"/>
+                                </segments>
+                                <connections>
+                                    <action selector="triangulationTypeChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="QkD-Di-38g"/>
+                                </connections>
+                            </segmentedControl>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Wireframe" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JZS-5R-nF8">
+                                <rect key="frame" x="-42" y="-21" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
                         <constraints>
                             <constraint firstItem="9Fz-MA-Cch" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="22Y-g8-hox"/>
                             <constraint firstItem="9Fz-MA-Cch" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="93Q-uL-TwL"/>
+                            <constraint firstItem="QyU-DE-xiM" firstAttribute="centerX" secondItem="7nP-6S-Iq8" secondAttribute="centerX" id="Gy7-tn-hkf"/>
+                            <constraint firstItem="QyU-DE-xiM" firstAttribute="centerX" secondItem="9Fz-MA-Cch" secondAttribute="centerX" id="JHE-SY-FrR"/>
+                            <constraint firstItem="QyU-DE-xiM" firstAttribute="top" secondItem="JZS-5R-nF8" secondAttribute="bottom" constant="13" id="Rn4-8G-mS8"/>
                             <constraint firstItem="9Fz-MA-Cch" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="U8l-JY-2o0"/>
+                            <constraint firstItem="JZS-5R-nF8" firstAttribute="leading" secondItem="7nP-6S-Iq8" secondAttribute="trailing" constant="8" symbolic="YES" id="XJx-OT-zMG"/>
+                            <constraint firstItem="JZS-5R-nF8" firstAttribute="centerY" secondItem="7nP-6S-Iq8" secondAttribute="centerY" id="fdH-iZ-mC3"/>
+                            <constraint firstItem="QyU-DE-xiM" firstAttribute="top" secondItem="7nP-6S-Iq8" secondAttribute="bottom" constant="8" symbolic="YES" id="qsy-0E-swE"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="QyU-DE-xiM" secondAttribute="bottom" constant="40" id="zWS-0J-qRl"/>
                         </constraints>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="7nP-6S-Iq8"/>
+                                <exclude reference="QyU-DE-xiM"/>
+                                <exclude reference="JZS-5R-nF8"/>
+                            </mask>
+                            <mask key="constraints">
+                                <exclude reference="zWS-0J-qRl"/>
+                                <exclude reference="XJx-OT-zMG"/>
+                                <exclude reference="fdH-iZ-mC3"/>
+                                <exclude reference="Gy7-tn-hkf"/>
+                                <exclude reference="JHE-SY-FrR"/>
+                                <exclude reference="Rn4-8G-mS8"/>
+                                <exclude reference="qsy-0E-swE"/>
+                            </mask>
+                        </variation>
+                        <variation key="heightClass=regular">
+                            <mask key="subviews">
+                                <include reference="7nP-6S-Iq8"/>
+                                <include reference="QyU-DE-xiM"/>
+                                <include reference="JZS-5R-nF8"/>
+                            </mask>
+                            <mask key="constraints">
+                                <include reference="zWS-0J-qRl"/>
+                                <include reference="XJx-OT-zMG"/>
+                                <include reference="fdH-iZ-mC3"/>
+                                <include reference="Gy7-tn-hkf"/>
+                                <include reference="JHE-SY-FrR"/>
+                                <include reference="Rn4-8G-mS8"/>
+                                <include reference="qsy-0E-swE"/>
+                            </mask>
+                        </variation>
                     </view>
                     <connections>
                         <outlet property="doubleTap" destination="npf-Hr-pPI" id="XOv-01-PX2"/>
                         <outlet property="singleTap" destination="2xS-8y-ExZ" id="0EO-su-lkg"/>
+                        <outlet property="solidWireFrameSwitch" destination="7nP-6S-Iq8" id="UaN-pR-pNV"/>
                         <outlet property="terrainView" destination="9Fz-MA-Cch" id="goU-qw-lx6"/>
+                        <outlet property="triangulationTypeSegementedControl" destination="QyU-DE-xiM" id="76d-tt-PDB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
