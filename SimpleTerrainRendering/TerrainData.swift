@@ -27,7 +27,7 @@ class TerrainData
     
     var minHeight : Float {
         var minHeight = data[0]
-        for var i = 1; i < width * height; i++
+        for i in 1 ..< (width * height)
         {
             if(data[i] < minHeight)
             {
@@ -36,9 +36,10 @@ class TerrainData
         }
         return minHeight
     }
+    
     var maxHeight : Float {
         var maxHeight = data[0]
-        for var i = 1; i < width * height; i++
+        for i in 1 ..< (width * height)
         {
             if(data[i] > maxHeight)
             {
@@ -56,7 +57,8 @@ class TerrainData
     
     func randomize(min min: Float, max: Float)
     {
-        for var i = 0; i < self.data.count; i++ {
+        for i in 0 ..< self.data.count
+        {
             self.data[i] = min + (max - min) * (Float(random()) / Float(RAND_MAX))
             // print(data[i])
         }
@@ -71,7 +73,7 @@ class TerrainData
         if(normalize)
         {
             scale = 0
-            for(var i = 0; i < size * size; i++)
+            for i in 0 ..< (size * size)
             {
                 scale += kernel[i]
             }
@@ -79,12 +81,12 @@ class TerrainData
         
         var tmp : [Float] = [Float](count: self.width * self.height, repeatedValue: 0.0)
         
-        for var y = 0; y < self.height; y++
+        for y in 0 ..< self.height
         {
-            for var x = 0; x < self.width; x++
+            for x in 0 ..< self.width
             {
                 var sum : Float = 0
-                for var i = 0; i < size * size; i++
+                for i in 0 ..< (size * size)
                 {
                     let px = min(self.width - 1, max(0, x + offset[i % 3]))
                     let py = min(self.height - 1, max(0, y + offset[i / 3]))
@@ -93,7 +95,7 @@ class TerrainData
                 tmp[y * self.width + x] = sum / scale
             }
         }
-        for var i = 0; i < self.width * self.height; i++
+        for i in 0 ..< (self.width * self.height)
         {
             self.data[i] = tmp[i]
         }

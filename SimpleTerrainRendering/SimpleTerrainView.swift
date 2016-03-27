@@ -102,9 +102,9 @@ class SimpleTerrainView : GLKView
         
 
         
-        for var y = 0; y < terrain.height; y++
+        for y in 0 ..< terrain.height
         {
-            for var x = 0; x < terrain.width; x++
+            for x in 0 ..< terrain.width
             {
                 let vertex = (y * terrain.width + x)
                 vertices[3 * vertex + 0] = Float(x)
@@ -129,9 +129,9 @@ class SimpleTerrainView : GLKView
                 normals[3 * vertex + 0] = vNormal.x
                 normals[3 * vertex + 1] = vNormal.y
                 normals[3 * vertex + 2] = vNormal.z
-    
-                let base : Float = 0.2
-                let terrainValue : Float = (terrain.data[vertex] - hmin) / (hmax - hmin)
+                
+                // let base : Float = 0.2
+                // let terrainValue : Float = (terrain.data[vertex] - hmin) / (hmax - hmin)
                 colors[4 * vertex + 0] = Float(x) / Float(terrain.width) // base + (1 - base) * terrainValue
                 colors[4 * vertex + 1] = Float(y) / Float(terrain.height) // base + (1 - base) * terrainValue
                 colors[4 * vertex + 2] = 1 // base + (1 - base) * terrainValue
@@ -157,9 +157,9 @@ class SimpleTerrainView : GLKView
         
         var triangle = 0;
         
-        for(var y = 0; y < terrain.height - 1; y++)
+        for y in 0 ..< (terrain.height - 1)
         {
-            for(var x = 0; x < terrain.width - 1; x++)
+            for x in 0 ..< (terrain.width - 1)
             {
                 let v1 = UInt32( (y + 0) * terrain.width + (x + 0) )
                 let v2 = UInt32( (y + 0) * terrain.width + (x + 1) )
@@ -215,22 +215,22 @@ class SimpleTerrainView : GLKView
                 if(self.isWireframe)
                 {
                     
-                    for(var i = 0; i < 5; i++)
+                    for i in 0 ..< 5
                     {
-                        for(var j = 0; j < 2; j++)
+                        for j in 0 ..< 2
                         {
-                            indices[2 * triangle + j] = wireframe[2 * i + j];
+                            indices[2 * triangle + j] = wireframe[2 * i + j]
                         }
-                        triangle++;
+                        triangle += 1
                     }
                 }
                 else
                 {
-                    for(var i = 0; i < 6; i++)
+                    for i in 0 ..< 6
                     {
-                        indices[3 * triangle + i] = solid[i];
+                        indices[3 * triangle + i] = solid[i]
                     }
-                    triangle += 2;
+                    triangle += 2
                 }
             }
         }
@@ -240,7 +240,7 @@ class SimpleTerrainView : GLKView
         
         let normalVertexcount = 2 * vertexCount
         var normalVertices : [Float] = [Float](count: normalVertexcount * 3, repeatedValue: 0.0)
-        for(var i = 0; i < vertexCount; i++)
+        for i in 0 ..< vertexCount
         {
             normalVertices[6 * i + 0] = vertices[3 * i + 0];
             normalVertices[6 * i + 1] = vertices[3 * i + 1];
