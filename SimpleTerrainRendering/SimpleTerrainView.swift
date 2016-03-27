@@ -22,6 +22,8 @@ class SimpleTerrainView : GLKView
     var isWireframe = false
     var triangulationType = 0
     
+    var cam : TerrainCamera? = nil
+    
     override func drawRect(rect: CGRect) {
         print("drawRect called")
         
@@ -29,9 +31,13 @@ class SimpleTerrainView : GLKView
         glClear( GLbitfield(GL_COLOR_BUFFER_BIT) )
         // glViewport(0, 0, GLsizei(self.frame.width), GLsizei(self.frame.height))
         
-        if(data != nil)
+        if(self.data != nil && self.cam != nil)
         {
             renderTerrain(data!)
+        }
+        else
+        {
+            print("missing camera or terrain")
         }
     }
     
@@ -52,27 +58,29 @@ class SimpleTerrainView : GLKView
         let d = distance * Float(terrain.width)
         
         // let proj = GLKMatrix4MakeOrtho(-d, d, -d, d, 0, 4 * d)
-        let proj = GLKMatrix4MakePerspective(Float(M_PI) / 3, 1.0, 1.0, 4 * d)
+        let proj = GLKMatrix4MakePerspective(Float(M_PI) / 3, 1.0, 1.0, 2 * d)
         glLoadMatrixf(glMatrix(proj))
         
         glMatrixMode(GLenum(GL_MODELVIEW))
         
         print("eye position: (\(d/2), \(d/2), \(d))");
-        let cam = GLKMatrix4MakeLookAt(
-            d, d, d,
-            // 0, 0, 0,
-            Float(terrain.width) / 2, Float(terrain.height) / 2, 0,
-            0, 0, 1)
+        
+        // TODO: use terrain camera once it's debugged
+        let camMatrix = GLKMatrix4MakeLookAt(
+            self.cam!.eye.x, self.cam!.eye.y, self.cam!.eye.z,
+            self.cam!.lookAt.x, self.cam!.lookAt.y, self.cam!.lookAt.z,
+            self.cam!.up.x, self.cam!.up.y, self.cam!.up.z
+            )
         glLoadIdentity()
         
         let lightpos : [Float] = [ 0, 0, 1, 0 ]
         glLightfv( GLenum(GL_LIGHT0), GLenum(GL_POSITION), lightpos)
 
-        glLoadMatrixf(glMatrix(cam))
-
+        glLoadMatrixf(glMatrix(camMatrix))
  
         // simpleTriangle()
         terrainGeometry(terrain)
+        // drawCamera(self.cam!)
     }
     
     func terrainGeometry(terrain: TerrainData)
@@ -272,7 +280,6 @@ class SimpleTerrainView : GLKView
         
         glEnable( GLenum(GL_RESCALE_NORMAL ) )
 
-
         glCullFace( GLenum(GL_BACK) )
         glEnable( GLenum(GL_CULL_FACE) )
         
@@ -308,6 +315,49 @@ class SimpleTerrainView : GLKView
         glDisableClientState(GLenum(GL_VERTEX_ARRAY))
 
     }
+    
+    func drawCamera(cam : TerrainCamera)
+    {
+        let upDir = GLKVector3MultiplyScalar(cam.up, 10)
+        let upEndPoint = GLKVector3Add(cam.eye, upDir)
+        
+        let viewDir = GLKVector3MultiplyScalar(cam.viewDir, 10)
+        let viewEndPoint = GLKVector3Add(cam.eye, viewDir)
+        
+        let rightDir = GLKVector3MultiplyScalar(cam.right, 10)
+        let rightEndPoint = GLKVector3Add(cam.eye, rightDir)
+        
+        let vertices : [Float] = [
+            cam.eye.x, cam.eye.y, cam.eye.z,
+            viewEndPoint.x, viewEndPoint.y, viewEndPoint.z,
+            cam.eye.x, cam.eye.y, cam.eye.z,
+            upEndPoint.x, upEndPoint.y, upEndPoint.z,
+            cam.eye.x, cam.eye.y, cam.eye.z,
+            rightEndPoint.x, rightEndPoint.y, rightEndPoint.z
+        ]
+        
+        let colors : [Float] = [
+            1, 1, 1, 1,
+            1, 0, 0, 1,
+            1, 1, 1, 1,
+            0, 0, 1, 1,
+            1, 1, 1, 1,
+            0, 1.0, 0, 1
+        ]
+        drawAsLines(vertices, colors: colors)
+    }
+    
+    func drawAsLines(vertices : [Float], colors : [Float])
+    {
+        glVertexPointer(3, GLenum(GL_FLOAT), 0, vertices)
+        glColorPointer(4, GLenum(GL_FLOAT), 0, colors)
+        glEnableClientState(GLenum(GL_VERTEX_ARRAY))
+        glEnableClientState(GLenum(GL_COLOR_ARRAY))
+        glDrawArrays(GLenum(GL_LINES), 0, GLsizei(vertices.count / 3))
+        glDisableClientState(GLenum(GL_COLOR_ARRAY))
+        glDisableClientState(GLenum(GL_VERTEX_ARRAY))
+    }
+    
     func simpleTriangle()
     {
         let z : Float = -0.5

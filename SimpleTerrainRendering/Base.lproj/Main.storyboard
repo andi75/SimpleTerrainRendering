@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
@@ -29,6 +29,8 @@
                                     <outletCollection property="gestureRecognizers" destination="2xS-8y-ExZ" appends="YES" id="5Fb-LE-zuw"/>
                                     <outletCollection property="gestureRecognizers" destination="npf-Hr-pPI" appends="YES" id="pvh-Wj-4XB"/>
                                     <outletCollection property="gestureRecognizers" destination="Gqa-D5-FtA" appends="YES" id="aFM-dP-zZJ"/>
+                                    <outletCollection property="gestureRecognizers" destination="DrV-7A-tFY" appends="YES" id="7k7-jM-fid"/>
+                                    <outletCollection property="gestureRecognizers" destination="QIP-Hl-HoX" appends="YES" id="F1m-gU-PbG"/>
                                 </connections>
                             </glkView>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7nP-6S-Iq8">
@@ -51,7 +53,7 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Wireframe" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JZS-5R-nF8">
                                 <rect key="frame" x="-42" y="-21" width="42" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
@@ -103,7 +105,9 @@
                         </variation>
                     </view>
                     <connections>
+                        <outlet property="doublePan" destination="DrV-7A-tFY" id="p16-T5-UMV"/>
                         <outlet property="doubleTap" destination="npf-Hr-pPI" id="XOv-01-PX2"/>
+                        <outlet property="singlePan" destination="Gqa-D5-FtA" id="qkP-Wb-oWs"/>
                         <outlet property="singleTap" destination="2xS-8y-ExZ" id="0EO-su-lkg"/>
                         <outlet property="solidWireFrameSwitch" destination="7nP-6S-Iq8" id="UaN-pR-pNV"/>
                         <outlet property="terrainView" destination="9Fz-MA-Cch" id="goU-qw-lx6"/>
@@ -121,9 +125,19 @@
                         <action selector="viewDoubletapped:" destination="BYZ-38-t0r" id="bnw-52-vLa"/>
                     </connections>
                 </tapGestureRecognizer>
-                <panGestureRecognizer minimumNumberOfTouches="2" id="Gqa-D5-FtA">
+                <panGestureRecognizer minimumNumberOfTouches="1" maximumNumberOfTouches="1" id="Gqa-D5-FtA" userLabel="Single Pan - TurnViewPoint">
                     <connections>
-                        <action selector="viewPanned:" destination="BYZ-38-t0r" id="pMH-Gb-dXt"/>
+                        <action selector="turnViewPoint:" destination="BYZ-38-t0r" id="R72-R3-IxO"/>
+                    </connections>
+                </panGestureRecognizer>
+                <panGestureRecognizer minimumNumberOfTouches="2" maximumNumberOfTouches="2" id="DrV-7A-tFY" userLabel="Double Pan - Move LeftRight ForwardBackward">
+                    <connections>
+                        <action selector="moveLeftRightForwardBackwardPlanar:" destination="BYZ-38-t0r" id="ZbB-4i-qtp"/>
+                    </connections>
+                </panGestureRecognizer>
+                <panGestureRecognizer minimumNumberOfTouches="3" maximumNumberOfTouches="3" id="QIP-Hl-HoX" userLabel="Triple Pan - Move UpDown">
+                    <connections>
+                        <action selector="moveUpDown:" destination="BYZ-38-t0r" id="moW-3B-Q91"/>
                     </connections>
                 </panGestureRecognizer>
             </objects>
