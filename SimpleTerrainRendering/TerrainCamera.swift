@@ -49,7 +49,7 @@ class TerrainCamera {
         get {
             let v = GLKVector3CrossProduct(self.right, self.viewDir
             )
-            print("up: \(v.x), \(v.y), \(v.z)")
+//            print("up: \(v.x), \(v.y), \(v.z)")
             return v
         }
     }

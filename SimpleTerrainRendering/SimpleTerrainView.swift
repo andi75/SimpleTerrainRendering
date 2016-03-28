@@ -23,7 +23,7 @@ class SimpleTerrainView : GLKView
     var cam : TerrainCamera? = nil
     
     override func drawRect(rect: CGRect) {
-        print("drawRect called")
+//        print("drawRect called")
         
 //        glClearColor(0.0, 0.0, 0.5, 0.0)
         glClearColor(1.0, 1.0, 1.0, 0.0)
@@ -79,7 +79,15 @@ class SimpleTerrainView : GLKView
         // simpleTriangle()
         terrainGeometry(terrain)
         // drawCamera(self.cam!)
+    
+        let hitResult = terrain.intersectWithRay(self.cam!.eye, direction: self.cam!.viewDir)
+        if(hitResult.isHit)
+        {
+//            print("hit from \(GLKV3toString(self.cam!.eye)) in direction \(GLKV3toString(self.cam!.viewDir)) at \(GLKV3toString(hitResult.location))")
+            simpleTetrahedron(0.1, location: hitResult.location)
+        }
     }
+
     
     func terrainGeometry(terrain: TerrainData)
     {
@@ -135,6 +143,12 @@ class SimpleTerrainView : GLKView
                 colors[4 * vertex + 2] = 1 // base + (1 - base) * terrainValue
                 
                 colors[4 * vertex + 3] = 1
+                
+//                if(x % 10 == 0 && y % 10 == 0)
+//                {
+//                    simpleTetrahedron(GLKVector3Make(Float(x), Float(y), terrain.data[y * terrain.width + x]))
+//                }
+
             }
         }
         
@@ -230,6 +244,7 @@ class SimpleTerrainView : GLKView
                     }
                     triangle += 2
                 }
+                
             }
         }
 //        print("indices: \(indices)")
@@ -371,6 +386,44 @@ class SimpleTerrainView : GLKView
         glDrawElements(GLenum(GL_TRIANGLES), 3, GLenum(GL_UNSIGNED_INT), indices)
         glDisableClientState(GLenum(GL_COLOR_ARRAY))
         glDisableClientState(GLenum(GL_VERTEX_ARRAY))
+    }
+    
+    func simpleTetrahedron(size : Float, location : GLKVector3)
+    {
+        let cos30 = cos( Float(M_PI / 6) )
+        let sin30 = sin( Float(M_PI / 6) )
+        var vertices : [Float] = [
+            0, 0, 1,
+            cos30, 0, -sin30,
+            -cos30 * cos30, sin30 * cos30, -sin30,
+            -cos30 * cos30, -sin30 * cos30, -sin30
+        ]
+        for i in 0 ..< 12
+        {
+            vertices[i] *= size
+        }
+        
+        for i in 0...3
+        {
+            vertices[3 * i + 0] += location.x
+            vertices[3 * i + 1] += location.y
+            vertices[3 * i + 2] += location.z
+        }
+        let indices : [UInt32] = [ 0, 1, 2, 0, 2, 3, 0, 3, 1, 1, 3, 2 ]
+        glVertexPointer(3, GLenum(GL_FLOAT), 0, vertices)
+        glColor4f(1.0, 1.0, 0.0, 1.0)
+        glEnableClientState(GLenum(GL_VERTEX_ARRAY))
+        glDrawElements(GLenum(GL_TRIANGLES), 12, GLenum(GL_UNSIGNED_INT), indices)
+        glDisableClientState(GLenum(GL_VERTEX_ARRAY))
+    }
+    
+    func intersect(origin : GLKVector3, direction : GLKVector3) -> GLKVector3
+    {
+        // find the square origion contains
+        // check intersection for both triangles in that square
+        // advance to next square
+        
+        return GLKVector3Make(0, 0, 0)
     }
 }
 

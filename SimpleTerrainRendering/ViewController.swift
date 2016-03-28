@@ -84,11 +84,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         {
             let delta = sender.translationInView(terrainView)
          
-            print("(turnView by \(delta.x), \(delta.y)")
+//            print("(turnView by \(delta.x), \(delta.y)")
             
             terrainView.cam?.phi += Float(delta.x) * 0.01
             terrainView.cam?.chi += Float(delta.y) * 0.01
-            print("chi: \(terrainView.cam!.chi / Float(M_PI))")
+//            print("chi: \(terrainView.cam!.chi / Float(M_PI))")
             
 //            if(delta.y < 0)
 //            {
@@ -109,7 +109,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         {
             let delta = sender.translationInView(terrainView)
             
-            print("(moveLeftRightForwardBackward by \(delta.x), \(delta.y)")
+//            print("(moveLeftRightForwardBackward by \(delta.x), \(delta.y)")
 
             terrainView.cam?.forwardBackwardPlanar(Float(-delta.y))
             terrainView.cam?.leftRight(Float(delta.x))
@@ -125,7 +125,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         {
             let delta = sender.translationInView(terrainView)
             
-            print("(moveUpDown by \(delta.x), \(delta.y)")
+//            print("(moveUpDown by \(delta.x), \(delta.y)")
             
             terrainView.cam?.lowerHigher(Float(delta.y))
             

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E149FAA31CA99C4600B73248 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E149FAA21CA99C4600B73248 /* Geometry.swift */; };
 		E166887C1C2967E400B7C336 /* TerrainCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = E166887B1C2967E400B7C336 /* TerrainCamera.swift */; };
 		F730AB021C26E0DF0035F2E9 /* SimpleTerrainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */; };
 		F7DD22211C26BE390082EA63 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DD22201C26BE390082EA63 /* AppDelegate.swift */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E149FAA21CA99C4600B73248 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		E166887B1C2967E400B7C336 /* TerrainCamera.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerrainCamera.swift; sourceTree = "<group>"; };
 		F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleTerrainView.swift; sourceTree = "<group>"; };
 		F7DD221D1C26BE390082EA63 /* SimpleTerrainRendering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimpleTerrainRendering.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,6 +70,7 @@
 				F7DD22291C26BE390082EA63 /* LaunchScreen.storyboard */,
 				F7DD222C1C26BE390082EA63 /* Info.plist */,
 				F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */,
+				E149FAA21CA99C4600B73248 /* Geometry.swift */,
 				E166887B1C2967E400B7C336 /* TerrainCamera.swift */,
 			);
 			path = SimpleTerrainRendering;
@@ -145,6 +148,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F730AB021C26E0DF0035F2E9 /* SimpleTerrainView.swift in Sources */,
+				E149FAA31CA99C4600B73248 /* Geometry.swift in Sources */,
 				F7DD22231C26BE390082EA63 /* ViewController.swift in Sources */,
 				F7DD22331C26BE740082EA63 /* TerrainData.swift in Sources */,
 				E166887C1C2967E400B7C336 /* TerrainCamera.swift in Sources */,

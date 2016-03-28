@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreGraphics
+import GLKit
 
 class TerrainData
 {
@@ -105,6 +106,47 @@ class TerrainData
     {
         let kernel : [Float] = [ 0.25, 0.5, 0.25, 0.5, 2, 0.5, 0.25, 0.5, 0.25 ]
         self.apply3x3Kernel(kernel, normalize: true)
+    }
+    
+    func intersectWithRay(origin : GLKVector3, direction: GLKVector3) -> (isHit: Bool, location: GLKVector3)
+    {
+        // find tile
+//        let xmin : Int = min( max(0, Int( floor(origin.x) )), self.width - 2)
+//        let ymin : Int = min( max(0, Int( floor(origin.x) )), self.height - 2)
+
+        for ymin in 0 ..< self.height - 1
+        {
+            for xmin in 0 ..< self.width - 1
+            {
+                
+                let v1 = ymin * self.width + xmin
+                let v2 = ymin * self.width + xmin + 1
+                let v3 = (ymin + 1) * self.width + xmin
+                let v4 = (ymin + 1) * self.width + xmin + 1
+                
+                let p1 = GLKVector3Make( Float(xmin), Float(ymin), data[v1] )
+                let p2 = GLKVector3Make( Float(xmin + 1), Float(ymin), data[v2] )
+                let p3 = GLKVector3Make( Float(xmin), Float(ymin + 1), data[v3] )
+                let p4 = GLKVector3Make( Float(xmin + 1), Float(ymin + 1), data[v4] )
+                
+                var hitInfo = intersectTriangleWithRay(p1, v2: p2, v3: p3, origin: origin, direction: direction)
+                if(!hitInfo.isHit)
+                {
+                    hitInfo = intersectTriangleWithRay(p4, v2: p2, v3: p3, origin: origin, direction: direction)
+                    
+                }
+                if(hitInfo.isHit)
+                {
+                    let dirScaled = GLKVector3MultiplyScalar(direction, hitInfo.t)
+                    let location = GLKVector3Add(origin, dirScaled)
+                    return (true, location)
+                }
+                
+            }
+        }
+        
+        
+        return (false, GLKVector3Make(0, 0, 0))
     }
 }
 
