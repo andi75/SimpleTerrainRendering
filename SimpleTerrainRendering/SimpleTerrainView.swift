@@ -17,8 +17,6 @@ class SimpleTerrainView : GLKView
     var hmin : Float = 0
     var hmax : Float = 1
     
-    var distance : Float = 0.25
-    
     var isWireframe = false
     var triangulationType = 0
     
@@ -27,8 +25,11 @@ class SimpleTerrainView : GLKView
     override func drawRect(rect: CGRect) {
         print("drawRect called")
         
-        glClearColor(0.0, 0.0, 0.5, 0.0)
-        glClear( GLbitfield(GL_COLOR_BUFFER_BIT) )
+//        glClearColor(0.0, 0.0, 0.5, 0.0)
+        glClearColor(1.0, 1.0, 1.0, 0.0)
+        glClear( GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  )
+        
+        glEnable( GLenum(GL_DEPTH_TEST) )
         // glViewport(0, 0, GLsizei(self.frame.width), GLsizei(self.frame.height))
         
         if(self.data != nil && self.cam != nil)
@@ -55,17 +56,14 @@ class SimpleTerrainView : GLKView
     {
         glMatrixMode(GLenum(GL_PROJECTION))
         // let proj = GLKMatrix4MakeOrtho(0, Float(terrain.width), 0, Float(terrain.height), 0, 100)
-        let d = distance * Float(terrain.width)
+        let d = Float(terrain.width)
         
         // let proj = GLKMatrix4MakeOrtho(-d, d, -d, d, 0, 4 * d)
-        let proj = GLKMatrix4MakePerspective(Float(M_PI) / 3, 1.0, 1.0, 2 * d)
+        let proj = GLKMatrix4MakePerspective(Float(M_PI) / 3, 1.0, 2.0,  2 * d)
         glLoadMatrixf(glMatrix(proj))
         
         glMatrixMode(GLenum(GL_MODELVIEW))
-        
-        print("eye position: (\(d/2), \(d/2), \(d))");
-        
-        // TODO: use terrain camera once it's debugged
+                
         let camMatrix = GLKMatrix4MakeLookAt(
             self.cam!.eye.x, self.cam!.eye.y, self.cam!.eye.z,
             self.cam!.lookAt.x, self.cam!.lookAt.y, self.cam!.lookAt.z,

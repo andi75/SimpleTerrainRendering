@@ -38,6 +38,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         terrain.smooth()
         
         terrainView!.context = EAGLContext(API: .OpenGLES1)
+
         terrainView!.data = terrain
         terrainView.hmax = 8;
         terrainView.hmin = 2;
