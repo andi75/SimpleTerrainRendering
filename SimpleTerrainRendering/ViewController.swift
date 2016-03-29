@@ -126,9 +126,21 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             let delta = sender.translationInView(terrainView)
             
 //            print("(moveUpDown by \(delta.x), \(delta.y)")
-            
-            terrainView.cam?.lowerHigher(Float(delta.y))
-            
+
+            let hitResult = terrainView.data!.intersectWithRay(
+                terrainView.cam!.eye,
+                direction: terrainView.cam!.viewDir
+            )
+
+            if(hitResult.isHit)
+            {
+                terrainView.cam?.lowerHigherWithFocus(Float(delta.y), focus: hitResult.location)
+            }
+            else
+            {
+                terrainView.cam?.lowerHigher(Float(delta.y))
+            }
+
             sender.setTranslation(CGPointZero, inView: terrainView)
             // print(sender.translationInView(terrainView))
             terrainView.setNeedsDisplay()

@@ -91,6 +91,19 @@ class TerrainCamera {
         eye = GLKVector3Add(eye, zScaled)
     }
     
+    func lowerHigherWithFocus(d : Float, focus : GLKVector3)
+    {
+        let zScaled = GLKVector3Make(0, 0, d)
+        self.eye = GLKVector3Add(eye, zScaled)
+        
+        let distHorizontal = sqrt( (focus.x - eye.x) * (focus.x - eye.x) + (focus.y - eye.y) * (focus.y - eye.y) )
+        
+//        print("chi before: \(self.chi)")
+        self.chi = atan( -(self.eye.z - focus.z ) / distHorizontal )
+//        print("chi after: \(self.chi)")
+
+    }
+    
     func lookAtMatrix() -> GLKMatrix4
     {
         let mat = GLKMatrix4MakeLookAt(
