@@ -104,6 +104,24 @@ class TerrainCamera {
 
     }
     
+    func zoomInOrOut(scale : Float)
+    {
+        var vScale : Float
+        if(scale < 1)
+        {
+            vScale = -1 / scale
+        }
+        else
+        {
+            vScale = scale
+        }
+        // vScale *= 10
+        
+        print("scale: \(vScale)")
+        
+        self.eye = GLKVector3Add(self.eye, GLKVector3MultiplyScalar(self.viewDir, vScale))
+    }
+    
     func lookAtMatrix() -> GLKMatrix4
     {
         let mat = GLKMatrix4MakeLookAt(
