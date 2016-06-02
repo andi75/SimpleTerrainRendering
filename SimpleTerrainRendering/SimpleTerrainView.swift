@@ -125,9 +125,9 @@ class SimpleTerrainView : GLKView
             )
             let vCross = GLKVector3CrossProduct(v1, v2)
             let vNormal = GLKVector3Normalize(vCross)
-            faceNormals[3 * i + 0] = vNormal.x;
-            faceNormals[3 * i + 1] = vNormal.y;
-            faceNormals[3 * i + 2] = vNormal.z;
+            faceNormals[3 * i + 0] = vNormal.x
+            faceNormals[3 * i + 1] = vNormal.y
+            faceNormals[3 * i + 2] = vNormal.z
         }
         return faceNormals
     }
@@ -238,6 +238,7 @@ class SimpleTerrainView : GLKView
                 // TODO: Create adjacency
             }
         }
+        return indices
     }
 
     func createTerrainGeometry(terrain: TerrainData)
