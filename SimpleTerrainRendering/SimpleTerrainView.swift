@@ -12,6 +12,17 @@ import GLKit
 
 class SimpleTerrainView : GLKView
 {
+    var vertices : [Float]?
+    var normals : [Float]?
+    var normalColors : [Float]?
+    var colors : [Float]?
+    var indices : [UInt32]?
+    var normalVertices : [Float]?
+    var vertexCount : Int = 0
+    var normalVertexcount : Int = 0
+    var primitiveCount : Int = 0
+    var indicesPerPrimitive : Int = 0
+    
     var data : TerrainData? = nil
     
     var hmin : Float = 0
@@ -77,7 +88,8 @@ class SimpleTerrainView : GLKView
         glLoadMatrixf(glMatrix(camMatrix))
  
         // simpleTriangle()
-        terrainGeometry(terrain)
+        createTerrainGeometry(terrain)
+        renderTerrainGeometry()
         // drawCamera(self.cam!)
     
         let hitResult = terrain.intersectWithRay(self.cam!.eye, direction: self.cam!.viewDir)
@@ -228,34 +240,31 @@ class SimpleTerrainView : GLKView
         }
     }
 
-    
-    func terrainGeometry(terrain: TerrainData)
+    func createTerrainGeometry(terrain: TerrainData)
     {
         
-        let vertexCount = terrain.width * terrain.height
-        let primitiveCount = self.isWireframe ?
+        self.vertexCount = terrain.width * terrain.height
+        self.primitiveCount = self.isWireframe ?
             (terrain.width - 1) * (terrain.height - 1) * 5 :
             (terrain.width - 1) * (terrain.height - 1) * 2
         
-        let indicesPerPrimitive = self.isWireframe ? 2 : 3
+        self.indicesPerPrimitive = self.isWireframe ? 2 : 3
         
-        var vertices : [Float] = [Float](count: vertexCount * 3, repeatedValue: 0.0)
-        var normals : [Float] = [Float](count: vertexCount * 3, repeatedValue: 0.0)
-        var normalColors : [Float] = [Float](count: vertexCount * 8, repeatedValue: 0.0)
-        var colors : [Float] = [Float](count: vertexCount * 4, repeatedValue: 0.0)
+        vertices = [Float](count: vertexCount * 3, repeatedValue: 0.0)
+        normals = [Float](count: vertexCount * 3, repeatedValue: 0.0)
+        normalColors = [Float](count: vertexCount * 8, repeatedValue: 0.0)
+        colors = [Float](count: vertexCount * 4, repeatedValue: 0.0)
         
-        var indices : [UInt32] = [UInt32](count: primitiveCount * indicesPerPrimitive, repeatedValue: 0)
-        
+        self.indices = [UInt32](count: self.primitiveCount * self.indicesPerPrimitive, repeatedValue: 0)
 
-        
         for y in 0 ..< terrain.height
         {
             for x in 0 ..< terrain.width
             {
                 let vertex = (y * terrain.width + x)
-                vertices[3 * vertex + 0] = Float(x)
-                vertices[3 * vertex + 1] = Float(y)
-                vertices[3 * vertex + 2] = terrain.data[vertex]
+                self.vertices![3 * vertex + 0] = Float(x)
+                self.vertices![3 * vertex + 1] = Float(y)
+                self.vertices![3 * vertex + 2] = terrain.data[vertex]
                 
                 // normals
                 let prefx = max(0, x - 1)
@@ -272,17 +281,17 @@ class SimpleTerrainView : GLKView
                 let vTemp = GLKVector3CrossProduct(vdx, vdy)
                 let vNormal = GLKVector3Normalize(vTemp)
                 
-                normals[3 * vertex + 0] = vNormal.x
-                normals[3 * vertex + 1] = vNormal.y
-                normals[3 * vertex + 2] = vNormal.z
+                self.normals![3 * vertex + 0] = vNormal.x
+                self.normals![3 * vertex + 1] = vNormal.y
+                self.normals![3 * vertex + 2] = vNormal.z
                 
                 // let base : Float = 0.2
                 // let terrainValue : Float = (terrain.data[vertex] - hmin) / (hmax - hmin)
-                colors[4 * vertex + 0] = Float(x) / Float(terrain.width) // base + (1 - base) * terrainValue
-                colors[4 * vertex + 1] = Float(y) / Float(terrain.height) // base + (1 - base) * terrainValue
-                colors[4 * vertex + 2] = 1 // base + (1 - base) * terrainValue
+                self.colors![4 * vertex + 0] = Float(x) / Float(terrain.width) // base + (1 - base) * terrainValue
+                self.colors![4 * vertex + 1] = Float(y) / Float(terrain.height) // base + (1 - base) * terrainValue
+                self.colors![4 * vertex + 2] = 1 // base + (1 - base) * terrainValue
                 
-                colors[4 * vertex + 3] = 1
+                self.colors![4 * vertex + 3] = 1
                 
 //                if(x % 10 == 0 && y % 10 == 0)
 //                {
@@ -292,20 +301,20 @@ class SimpleTerrainView : GLKView
             }
         }
         
-        colors[4 * 0 + 0] = 1;
-        colors[4 * 0 + 1] = 1;
-        colors[4 * 0 + 2] = 0;
-        colors[4 * 0 + 3] = 1;
+        self.colors![4 * 0 + 0] = 1;
+        self.colors![4 * 0 + 1] = 1;
+        self.colors![4 * 0 + 2] = 0;
+        self.colors![4 * 0 + 3] = 1;
 
-        colors[4 * (terrain.width - 1) + 0] = 1;
-        colors[4 * (terrain.width - 1) + 1] = 0;
-        colors[4 * (terrain.width - 1) + 2] = 0;
-        colors[4 * (terrain.width - 1) + 3] = 1;
+        self.colors![4 * (terrain.width - 1) + 0] = 1;
+        self.colors![4 * (terrain.width - 1) + 1] = 0;
+        self.colors![4 * (terrain.width - 1) + 2] = 0;
+        self.colors![4 * (terrain.width - 1) + 3] = 1;
 
-        colors[4 * (terrain.width * (terrain.height - 1)) + 0] = 0;
-        colors[4 * (terrain.width * (terrain.height - 1)) + 1] = 1;
-        colors[4 * (terrain.width * (terrain.height - 1)) + 2] = 0;
-        colors[4 * (terrain.width * (terrain.height - 1)) + 3] = 1;
+        self.colors![4 * (terrain.width * (terrain.height - 1)) + 0] = 0;
+        self.colors![4 * (terrain.width * (terrain.height - 1)) + 1] = 1;
+        self.colors![4 * (terrain.width * (terrain.height - 1)) + 2] = 0;
+        self.colors![4 * (terrain.width * (terrain.height - 1)) + 3] = 1;
         
         var triangle = 0;
         
@@ -318,8 +327,8 @@ class SimpleTerrainView : GLKView
                 let v3 = UInt32( (y + 1) * terrain.width + (x + 0) )
                 let v4 = UInt32( (y + 1) * terrain.width + (x + 1) )
                 
-                let d14 = abs(vertices[3 * Int(v1) + 2] - vertices[3 * Int(v4) + 2])
-                let d23 = abs(vertices[3 * Int(v2) + 2] - vertices[3 * Int(v3) + 2])
+                let d14 = abs(self.vertices![3 * Int(v1) + 2] - self.vertices![3 * Int(v4) + 2])
+                let d23 = abs(self.vertices![3 * Int(v2) + 2] - self.vertices![3 * Int(v3) + 2])
                 
                 let wireframe2 =
                     (d14 < d23) ?
@@ -371,7 +380,7 @@ class SimpleTerrainView : GLKView
                     {
                         for j in 0 ..< 2
                         {
-                            indices[2 * triangle + j] = wireframe[2 * i + j]
+                            self.indices![2 * triangle + j] = wireframe[2 * i + j]
                         }
                         triangle += 1
                     }
@@ -380,7 +389,7 @@ class SimpleTerrainView : GLKView
                 {
                     for i in 0 ..< 6
                     {
-                        indices[3 * triangle + i] = solid[i]
+                        self.indices![3 * triangle + i] = solid[i]
                     }
                     triangle += 2
                 }
@@ -391,32 +400,34 @@ class SimpleTerrainView : GLKView
 //        print("vertices: \(vertices)")
 //        print("colors: \(colors)")
         
-        let normalVertexcount = 2 * vertexCount
-        var normalVertices : [Float] = [Float](count: normalVertexcount * 3, repeatedValue: 0.0)
+        self.normalVertexcount = 2 * self.vertexCount
+        self.normalVertices = [Float](count: self.normalVertexcount * 3, repeatedValue: 0.0)
         for i in 0 ..< vertexCount
         {
-            normalVertices[6 * i + 0] = vertices[3 * i + 0];
-            normalVertices[6 * i + 1] = vertices[3 * i + 1];
-            normalVertices[6 * i + 2] = vertices[3 * i + 2];
-            normalVertices[6 * i + 3] = vertices[3 * i + 0] + normals[3 * i + 0];
-            normalVertices[6 * i + 4] = vertices[3 * i + 1] + normals[3 * i + 1];
-            normalVertices[6 * i + 5] = vertices[3 * i + 2] + normals[3 * i + 2];
+            normalVertices![6 * i + 0] = self.vertices![3 * i + 0];
+            normalVertices![6 * i + 1] = self.vertices![3 * i + 1];
+            normalVertices![6 * i + 2] = self.vertices![3 * i + 2];
+            normalVertices![6 * i + 3] = self.vertices![3 * i + 0] + self.normals![3 * i + 0];
+            normalVertices![6 * i + 4] = self.vertices![3 * i + 1] + self.normals![3 * i + 1];
+            normalVertices![6 * i + 5] = self.vertices![3 * i + 2] + self.normals![3 * i + 2];
             
-            normalColors[8 * i + 0] = 1.0;
-            normalColors[8 * i + 1] = 0.0;
-            normalColors[8 * i + 2] = 0.0;
-            normalColors[8 * i + 3] = 1.0;
+            normalColors![8 * i + 0] = 1.0;
+            normalColors![8 * i + 1] = 0.0;
+            normalColors![8 * i + 2] = 0.0;
+            normalColors![8 * i + 3] = 1.0;
             
-            normalColors[8 * i + 4] = 1.0;
-            normalColors[8 * i + 5] = 1.0;
-            normalColors[8 * i + 6] = 0.0;
-            normalColors[8 * i + 7] = 1.0;
+            normalColors![8 * i + 4] = 1.0;
+            normalColors![8 * i + 5] = 1.0;
+            normalColors![8 * i + 6] = 0.0;
+            normalColors![8 * i + 7] = 1.0;
         }
-        
-        
-        glVertexPointer(3, GLenum(GL_FLOAT), 0, vertices)
-        glColorPointer(4, GLenum(GL_FLOAT), 0, colors)
-        glNormalPointer(GLenum(GL_FLOAT), 0, normals)
+    }
+    
+    func renderTerrainGeometry()
+    {
+        glVertexPointer(3, GLenum(GL_FLOAT), 0, self.vertices!)
+        glColorPointer(4, GLenum(GL_FLOAT), 0, self.colors!)
+        glNormalPointer(GLenum(GL_FLOAT), 0, self.normals!)
         glEnableClientState(GLenum(GL_VERTEX_ARRAY))
         glEnableClientState(GLenum(GL_COLOR_ARRAY))
         glEnableClientState(GLenum(GL_NORMAL_ARRAY))
@@ -432,7 +443,7 @@ class SimpleTerrainView : GLKView
         glLightfv( GLenum(GL_LIGHT0), GLenum(GL_SPECULAR), light0specular)
         
         glEnable( GLenum(GL_RESCALE_NORMAL ) )
-
+        
         glCullFace( GLenum(GL_BACK) )
         glEnable( GLenum(GL_CULL_FACE) )
         
@@ -443,11 +454,11 @@ class SimpleTerrainView : GLKView
         
         if(self.isWireframe)
         {
-            glDrawElements(GLenum(GL_LINES), GLsizei(2 * triangle), GLenum(GL_UNSIGNED_INT), indices)
+            glDrawElements(GLenum(GL_LINES), GLsizei(2 * self.primitiveCount), GLenum(GL_UNSIGNED_INT), self.indices!)
         }
         else
         {
-            glDrawElements(GLenum(GL_TRIANGLES), GLsizei(3 * triangle), GLenum(GL_UNSIGNED_INT), indices)
+            glDrawElements(GLenum(GL_TRIANGLES), GLsizei(3 * self.primitiveCount), GLenum(GL_UNSIGNED_INT), self.indices!)
         }
         glDisableClientState(GLenum(GL_NORMAL_ARRAY))
         glDisableClientState(GLenum(GL_COLOR_ARRAY))
@@ -459,15 +470,16 @@ class SimpleTerrainView : GLKView
         // draw normals
         // glColor4f(1.0, 0.0, 0.0, 1.0)
         
-        glVertexPointer(3, GLenum(GL_FLOAT), 0, normalVertices)
-        glColorPointer(4, GLenum(GL_FLOAT), 0, normalColors)
+        glVertexPointer(3, GLenum(GL_FLOAT), 0, self.normalVertices!)
+        glColorPointer(4, GLenum(GL_FLOAT), 0, self.normalColors!)
         glEnableClientState(GLenum(GL_VERTEX_ARRAY))
         glEnableClientState(GLenum(GL_COLOR_ARRAY))
-        // glDrawArrays(GLenum(GL_LINES), 0, GLsizei(normalVertexcount))
+        // glDrawArrays(GLenum(GL_LINES), 0, GLsizei(self.normalVertexcount))
         glDisableClientState(GLenum(GL_COLOR_ARRAY))
         glDisableClientState(GLenum(GL_VERTEX_ARRAY))
-
+        
     }
+
     
     func drawCamera(cam : TerrainCamera)
     {

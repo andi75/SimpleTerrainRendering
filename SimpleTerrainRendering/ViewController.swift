@@ -21,6 +21,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     @IBOutlet weak var solidWireFrameSwitch: UISwitch!
     @IBOutlet weak var triangulationTypeSegementedControl: UISegmentedControl!
     
+    var lastZoom : Float = 1
+    
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         if(
             (gestureRecognizer == singlePan && otherGestureRecognizer == doublePan) ||
@@ -109,7 +111,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         {
             let delta = sender.translationInView(terrainView)
             
-//            print("(moveLeftRightForwardBackward by \(delta.x), \(delta.y)")
+            print("(moveLeftRightForwardBackward by \(delta.x), \(delta.y)")
 
             terrainView.cam?.forwardBackwardPlanar(Float(-delta.y))
             terrainView.cam?.leftRight(Float(delta.x))
@@ -145,6 +147,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             // print(sender.translationInView(terrainView))
             terrainView.setNeedsDisplay()
         }
+    }
+    @IBAction func zoomInOrOut(sender: UIPinchGestureRecognizer) {
+        if(sender.state == .Began)
+        {
+            self.lastZoom = 1
+        }
+        if(sender.state == .Changed)
+        {
+            print("scale: \(sender.scale), velocity: \(sender.velocity)")
+            terrainView.cam?.zoomInOrOut(Float(sender.scale) / self.lastZoom)
+            self.lastZoom = Float(sender.scale)
+        }
+        terrainView.setNeedsDisplay()
     }
     
     @IBAction func solidWireFrameSwitched(sender: UISwitch) {
