@@ -87,6 +87,146 @@ class SimpleTerrainView : GLKView
             simpleTetrahedron(0.1, location: hitResult.location)
         }
     }
+    
+    func createFaceNormals(vertices: [Float], indices: [Int32]) -> [Float]
+    {
+        let nFaces : Int = indices.count / 3
+        
+        var faceNormals : [Float] = [Float](count: 3 * nFaces, repeatedValue: 0)
+        
+        for i in 0..<nFaces
+        {
+            let a = Int( indices[3 * i + 0])
+            let b = Int( indices[3 * i + 1])
+            let c = Int( indices[3 * i + 2])
+            
+            let v1 = GLKVector3Make(
+                vertices[3 * b + 0] - vertices[3 * a + 0],
+                vertices[3 * b + 1] - vertices[3 * a + 1],
+                vertices[3 * b + 2] - vertices[3 * a + 2]
+            )
+            
+            let v2 = GLKVector3Make(
+                vertices[3 * c + 0] - vertices[3 * a + 0],
+                vertices[3 * c + 1] - vertices[3 * a + 1],
+                vertices[3 * c + 2] - vertices[3 * a + 2]
+            )
+            let vCross = GLKVector3CrossProduct(v1, v2)
+            let vNormal = GLKVector3Normalize(vCross)
+            faceNormals[3 * i + 0] = vNormal.x;
+            faceNormals[3 * i + 1] = vNormal.y;
+            faceNormals[3 * i + 2] = vNormal.z;
+        }
+        return faceNormals
+    }
+    
+    func createShadowGeometry(vertices: [Float], indices: [Int32], faceNormals: [Float], lightDirection: GLKVector3)
+    {
+        
+    }
+    
+    func createVertexGeometry(terrain: TerrainData) -> [Float]
+    {
+        let vertexCount = terrain.width * terrain.height
+
+        var vertices : [Float] = [Float](count: vertexCount * 3, repeatedValue: 0.0)
+
+        for y in 0 ..< terrain.height
+        {
+            for x in 0 ..< terrain.width
+            {
+                let vertex = (y * terrain.width + x)
+                vertices[3 * vertex + 0] = Float(x)
+                vertices[3 * vertex + 1] = Float(y)
+                vertices[3 * vertex + 2] = terrain.data[vertex]
+            }
+        }
+        return vertices
+    }
+    
+    func createNormalGeometry(terrain: TerrainData) -> [Float]
+    {
+        let vertexCount = terrain.width * terrain.height
+        
+        var normals : [Float] = [Float](count: vertexCount * 3, repeatedValue: 0.0)
+        
+        for y in 0 ..< terrain.height
+        {
+            for x in 0 ..< terrain.width
+            {
+                let vertex = (y * terrain.width + x)
+                
+                let prefx = max(0, x - 1)
+                let postx = min(x + 1, terrain.width - 1)
+                let prefy = max(0, y - 1)
+                let posty = min(y + 1, terrain.height - 1)
+                
+                let vprex = (y * terrain.width + prefx)
+                let vpostx = (y * terrain.width + postx)
+                let vprey = (prefy * terrain.width + x)
+                let vposty = (posty * terrain.width + x)
+                let vdx = GLKVector3(v: (2, 0, terrain.data[vpostx] - terrain.data[vprex]) )
+                let vdy = GLKVector3(v: (0, 2, terrain.data[vposty] - terrain.data[vprey]) )
+                let vTemp = GLKVector3CrossProduct(vdx, vdy)
+                let vNormal = GLKVector3Normalize(vTemp)
+                
+                normals[3 * vertex + 0] = vNormal.x
+                normals[3 * vertex + 1] = vNormal.y
+                normals[3 * vertex + 2] = vNormal.z            }
+        }
+        return normals
+    }
+    
+    func createTriangleIndices(terrain: TerrainData) -> [UInt32]
+    {
+        let primitiveCount = (terrain.width - 1) * (terrain.height - 1) * 2
+        var indices : [UInt32] = [UInt32](count: primitiveCount * 3, repeatedValue: 0)
+
+        var triangle = 0;
+        
+        for y in 0 ..< (terrain.height - 1)
+        {
+            for x in 0 ..< (terrain.width - 1)
+            {
+                let v1 = (y + 0) * terrain.width + (x + 0)
+                let v2 = (y + 0) * terrain.width + (x + 1)
+                let v3 = (y + 1) * terrain.width + (x + 0)
+                let v4 = (y + 1) * terrain.width + (x + 1)
+                
+                let d14 = abs(terrain.data[v1] - terrain.data[v4])
+                let d23 = abs(terrain.data[v2] - terrain.data[v3])
+                
+                let solid2 = (d14 < d23) ?
+                    [ v1, v2, v3, v2, v4, v3 ] :
+                    [ v1, v2, v4, v1, v4, v3 ];
+                
+                let solid1 = ((x + y) % 2 == 0) ?
+                    [ v1, v2, v3, v2, v4, v3 ] :
+                    [ v1, v2, v4, v1, v4, v3 ];
+                
+                let solid0 = [ v1, v2, v3, v2, v4, v3 ]
+                
+                var solid : [Int]
+                
+                switch(self.triangulationType)
+                {
+                case 0: solid = solid0
+                case 1: solid = solid1
+                case 2: solid = solid2
+                default: solid = solid0
+                    print("not supposed to happen")
+                }
+                
+                for i in 0 ..< 6
+                {
+                    indices[3 * triangle + i] = UInt32(solid[i])
+                }
+                triangle += 2
+
+                // TODO: Create adjacency
+            }
+        }
+    }
 
     
     func terrainGeometry(terrain: TerrainData)
