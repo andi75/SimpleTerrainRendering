@@ -35,17 +35,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        var terrain = TerrainData(width: 128, height: 128)
+        let terrain = TerrainData(width: 128, height: 128)
         terrain.randomize(min: 0, max: 15)
         terrain.smooth()
         
         terrainView!.context = EAGLContext(API: .OpenGLES1)
 
-        terrainView!.data = terrain
-        terrainView.hmax = 8;
-        terrainView.hmin = 2;
+        terrainView!.renderer.data = terrain
+        terrainView.renderer.hmax = 8;
+        terrainView.renderer.hmin = 2;
         
-        terrainView!.cam = TerrainCamera(terrain: terrain)
+        terrainView!.renderer.cam = TerrainCamera(terrain: terrain)
         
         singleTap.delaysTouchesBegan = true
         doubleTap.delaysTouchesBegan = true
@@ -58,8 +58,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 //        doublePan.delegate = self
         
         
-        self.solidWireFrameSwitch?.on = terrainView.isWireframe
-        self.triangulationTypeSegementedControl?.selectedSegmentIndex = terrainView.triangulationType
+        self.solidWireFrameSwitch?.on = terrainView.renderer.isWireframe
+        self.triangulationTypeSegementedControl?.selectedSegmentIndex = terrainView.renderer.triangulationType
     }
 
     override func didReceiveMemoryWarning() {
@@ -68,14 +68,19 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     @IBAction func viewTapped(sender: UITapGestureRecognizer) {
-        terrainView.data?.smooth()
+        // only do this once at the moment, but might actually make this user editable
+        let interations = 1
+        for _ in 0..<interations
+        {
+            terrainView.renderer.data?.smooth()
+        }
         terrainView.setNeedsDisplay()
         print("smoothed")
     }
     
     @IBAction func viewDoubletapped(sender: UITapGestureRecognizer) {
-        terrainView.data?.randomize(min: 0, max: 15)
-        terrainView.data?.smooth()
+        terrainView.renderer.data?.randomize(min: 0, max: 15)
+        terrainView.renderer.data?.smooth()
         terrainView.setNeedsDisplay()
         print("randomized")
     }
@@ -88,8 +93,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
          
 //            print("(turnView by \(delta.x), \(delta.y)")
             
-            terrainView.cam?.phi += Float(delta.x) * 0.01
-            terrainView.cam?.chi += Float(delta.y) * 0.01
+            terrainView.renderer.cam?.phi += Float(delta.x) * 0.01
+            terrainView.renderer.cam?.chi += Float(delta.y) * 0.01
 //            print("chi: \(terrainView.cam!.chi / Float(M_PI))")
             
 //            if(delta.y < 0)
@@ -113,8 +118,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             
             print("(moveLeftRightForwardBackward by \(delta.x), \(delta.y)")
 
-            terrainView.cam?.forwardBackwardPlanar(Float(-delta.y))
-            terrainView.cam?.leftRight(Float(delta.x))
+            terrainView.renderer.cam?.forwardBackwardPlanar(Float(-delta.y))
+            terrainView.renderer.cam?.leftRight(Float(delta.x))
             
             sender.setTranslation(CGPointZero, inView: terrainView)
             // print(sender.translationInView(terrainView))
@@ -129,18 +134,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             
 //            print("(moveUpDown by \(delta.x), \(delta.y)")
 
-            let hitResult = terrainView.data!.intersectWithRay(
-                terrainView.cam!.eye,
-                direction: terrainView.cam!.viewDir
+            let hitResult = terrainView.renderer.data!.intersectWithRay(
+                terrainView.renderer.cam!.eye,
+                direction: terrainView.renderer.cam!.viewDir
             )
 
             if(hitResult.isHit)
             {
-                terrainView.cam?.lowerHigherWithFocus(Float(delta.y), focus: hitResult.location)
+                terrainView.renderer.cam?.lowerHigherWithFocus(Float(delta.y), focus: hitResult.location)
             }
             else
             {
-                terrainView.cam?.lowerHigher(Float(delta.y))
+                terrainView.renderer.cam?.lowerHigher(Float(delta.y))
             }
 
             sender.setTranslation(CGPointZero, inView: terrainView)
@@ -156,18 +161,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         if(sender.state == .Changed)
         {
             print("scale: \(sender.scale), velocity: \(sender.velocity)")
-            terrainView.cam?.zoomInOrOut(Float(sender.scale) / self.lastZoom)
+            terrainView.renderer.cam?.zoomInOrOut(Float(sender.scale) / self.lastZoom)
             self.lastZoom = Float(sender.scale)
         }
         terrainView.setNeedsDisplay()
     }
     
     @IBAction func solidWireFrameSwitched(sender: UISwitch) {
-        self.terrainView.isWireframe = sender.on
+        self.terrainView.renderer.isWireframe = sender.on
         self.terrainView.setNeedsDisplay()
     }
     @IBAction func triangulationTypeChanged(sender: UISegmentedControl) {
-        self.terrainView.triangulationType = sender.selectedSegmentIndex
+        self.terrainView.renderer.triangulationType = sender.selectedSegmentIndex
         self.terrainView.setNeedsDisplay()
     }
 }

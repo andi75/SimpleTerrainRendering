@@ -10,7 +10,7 @@
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="SimpleTerrainRendering" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="SimpleTerrainIOS" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -19,7 +19,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <glkView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" drawableDepthFormat="24" translatesAutoresizingMaskIntoConstraints="NO" id="9Fz-MA-Cch" customClass="SimpleTerrainView" customModule="SimpleTerrainRendering" customModuleProvider="target">
+                            <glkView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" drawableDepthFormat="24" translatesAutoresizingMaskIntoConstraints="NO" id="9Fz-MA-Cch" customClass="SimpleTerrainView" customModule="SimpleTerrainIOS" customModuleProvider="target">
                                 <rect key="frame" x="20" y="20" width="560" height="560"/>
                                 <gestureRecognizers/>
                                 <constraints>
