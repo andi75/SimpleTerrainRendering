@@ -14,7 +14,7 @@ class ViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         let terrain = TerrainData(width: 128, height: 128)
         terrain.randomize(min: 0, max: 15)
         terrain.smooth()

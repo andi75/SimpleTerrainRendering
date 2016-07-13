@@ -34,6 +34,9 @@ class TerrainRenderer
     var primitiveCount : Int = 0
     var indicesPerPrimitive : Int = 0
     
+    var xyScale : Float = 1.0
+    var zScale : Float = 1.0
+    
     var data : TerrainData? = nil
     
     var hmin : Float = 0
@@ -45,7 +48,7 @@ class TerrainRenderer
     var cam : TerrainCamera? = nil
     
     func render(width width : CGFloat, height : CGFloat) {
-        print("render() called")
+//        print("render() called")
         
         glClearColor(0.0, 0.0, 0.5, 0.0)
 //        glClearColor(1.0, 1.0, 1.0, 0.0)
@@ -78,10 +81,10 @@ class TerrainRenderer
     {
         glMatrixMode(GLenum(GL_PROJECTION))
         // let proj = GLKMatrix4MakeOrtho(0, Float(terrain.width), 0, Float(terrain.height), 0, 100)
-        let d = Float(terrain.width)
+        let d = Float(terrain.width) * xyScale
         
         // let proj = GLKMatrix4MakeOrtho(-d, d, -d, d, 0, 4 * d)
-        let proj = GLKMatrix4MakePerspective( Float(M_PI) / 3.0, Float(width / height), 2.0,  2 * d)
+        let proj = GLKMatrix4MakePerspective( Float(M_PI) / 4.0, Float(width / height), 2.0,  2 * d)
         glLoadMatrixf(glMatrix(proj))
         
         glMatrixMode(GLenum(GL_MODELVIEW))
@@ -159,9 +162,9 @@ class TerrainRenderer
             for x in 0 ..< terrain.width
             {
                 let vertex = (y * terrain.width + x)
-                vertices[3 * vertex + 0] = Float(x)
+                vertices[3 * vertex + 0] = Float(x) // TODO: xyScale
                 vertices[3 * vertex + 1] = Float(y)
-                vertices[3 * vertex + 2] = terrain.data[vertex]
+                vertices[3 * vertex + 2] = terrain.data[vertex] // TODO: zScale
             }
         }
         return vertices
@@ -274,9 +277,9 @@ class TerrainRenderer
             for x in 0 ..< terrain.width
             {
                 let vertex = (y * terrain.width + x)
-                self.vertices![3 * vertex + 0] = Float(x)
-                self.vertices![3 * vertex + 1] = Float(y)
-                self.vertices![3 * vertex + 2] = terrain.data[vertex]
+                self.vertices![3 * vertex + 0] = Float(x) * xyScale
+                self.vertices![3 * vertex + 1] = Float(y) * xyScale
+                self.vertices![3 * vertex + 2] = terrain.data[vertex] * zScale
                 
                 // normals
                 let prefx = max(0, x - 1)

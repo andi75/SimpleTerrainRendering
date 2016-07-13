@@ -67,7 +67,7 @@ class TerrainCamera {
     func forwardBackward(d : Float)
     {
         let viewDirScaled = GLKVector3MultiplyScalar(self.viewDir, d)
-        eye = GLKVector3Add(eye, viewDirScaled)
+        self.eye = GLKVector3Add(self.eye, viewDirScaled)
     }
     
     func forwardBackwardPlanar(d : Float)
@@ -75,26 +75,26 @@ class TerrainCamera {
         let viewHorizontal = GLKVector3Make(self.viewDir.x, self.viewDir.y, 0)
         let viewHorizontalNormalized = GLKVector3Normalize(viewHorizontal)
         let viewHorizontalScaled = GLKVector3MultiplyScalar(viewHorizontalNormalized, d)
-        eye = GLKVector3Add(eye, viewHorizontalScaled)
+        self.eye = GLKVector3Add(self.eye, viewHorizontalScaled)
     }
     
     
     func leftRight(d : Float)
     {
         let rightScaled = GLKVector3MultiplyScalar(self.right, d)
-        eye = GLKVector3Add(eye, rightScaled)
+        self.eye = GLKVector3Add(self.eye, rightScaled)
     }
     
     func lowerHigher(d : Float)
     {
         let zScaled = GLKVector3Make(0, 0, d)
-        eye = GLKVector3Add(eye, zScaled)
+        self.eye = GLKVector3Add(self.eye, zScaled)
     }
     
     func lowerHigherWithFocus(d : Float, focus : GLKVector3)
     {
         let zScaled = GLKVector3Make(0, 0, d)
-        self.eye = GLKVector3Add(eye, zScaled)
+        self.eye = GLKVector3Add(self.eye, zScaled)
         
         let distHorizontal = sqrt( (focus.x - eye.x) * (focus.x - eye.x) + (focus.y - eye.y) * (focus.y - eye.y) )
         

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import CoreGraphics
 import GLKit
 
 class TerrainData
@@ -54,6 +53,23 @@ class TerrainData
     {
         self.rect = CGRectMake(0, 0, CGFloat(width), CGFloat(height))
         self.data = [Float](count: width * height, repeatedValue: 0.0)
+    }
+    
+    init(qt : QuadTreeTerrain, level : Int)
+    {
+        let width = QuadTreeTerrain.getWidth(level)
+        let height = width
+        
+        self.rect = CGRectMake(0, 0, CGFloat(width), CGFloat(height))
+        self.data = [Float](count: width * height, repeatedValue: 0.0)
+        
+        for y in 0..<height
+        {
+            for x in 0..<width
+            {
+                self.data[y * width + x] = qt.getDataAt(level, x: x, y: y)
+            }
+        }
     }
     
     func randomize(min min: Float, max: Float)
@@ -144,7 +160,6 @@ class TerrainData
                 
             }
         }
-        
         
         return (false, GLKVector3Make(0, 0, 0))
     }

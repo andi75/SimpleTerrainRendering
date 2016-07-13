@@ -13,9 +13,11 @@
 		E1444B261D3276D5004F5C05 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1444B241D3276D5004F5C05 /* Main.storyboard */; };
 		E149FAA31CA99C4600B73248 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E149FAA21CA99C4600B73248 /* Geometry.swift */; };
 		E166887C1C2967E400B7C336 /* TerrainCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = E166887B1C2967E400B7C336 /* TerrainCamera.swift */; };
+		E16B63221D368409009EA105 /* QuadTreeTerrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = E16B63211D368409009EA105 /* QuadTreeTerrain.swift */; };
 		E1B747C31D352130008C0F74 /* TerrainData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DD22321C26BE740082EA63 /* TerrainData.swift */; };
 		E1B747C41D352133008C0F74 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E149FAA21CA99C4600B73248 /* Geometry.swift */; };
 		E1B747C51D352136008C0F74 /* TerrainCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = E166887B1C2967E400B7C336 /* TerrainCamera.swift */; };
+		E1F0AE171D368DEA00B1EFF6 /* QuadTreeTerrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = E16B63211D368409009EA105 /* QuadTreeTerrain.swift */; };
 		E1F7BF321D352C3900C6622B /* TerrainRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F7BF311D352C3900C6622B /* TerrainRenderer.swift */; };
 		E1F7BF331D352D8000C6622B /* TerrainRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F7BF311D352C3900C6622B /* TerrainRenderer.swift */; };
 		E1F7BF351D352E0200C6622B /* TerrainViewOSX.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F7BF341D352E0200C6622B /* TerrainViewOSX.swift */; };
@@ -37,6 +39,7 @@
 		E1444B271D3276D5004F5C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E149FAA21CA99C4600B73248 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		E166887B1C2967E400B7C336 /* TerrainCamera.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerrainCamera.swift; sourceTree = "<group>"; };
+		E16B63211D368409009EA105 /* QuadTreeTerrain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuadTreeTerrain.swift; sourceTree = "<group>"; };
 		E1F7BF311D352C3900C6622B /* TerrainRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerrainRenderer.swift; sourceTree = "<group>"; };
 		E1F7BF341D352E0200C6622B /* TerrainViewOSX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerrainViewOSX.swift; sourceTree = "<group>"; };
 		F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimpleTerrainView.swift; path = SimpleTerrainRendering/SimpleTerrainView.swift; sourceTree = "<group>"; };
@@ -117,6 +120,7 @@
 		F7DD221F1C26BE390082EA63 /* SimpleTerrainRendering */ = {
 			isa = PBXGroup;
 			children = (
+				E16B63211D368409009EA105 /* QuadTreeTerrain.swift */,
 				F7DD22321C26BE740082EA63 /* TerrainData.swift */,
 				E149FAA21CA99C4600B73248 /* Geometry.swift */,
 				E166887B1C2967E400B7C336 /* TerrainCamera.swift */,
@@ -226,6 +230,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1F0AE171D368DEA00B1EFF6 /* QuadTreeTerrain.swift in Sources */,
 				E1444B211D3276D5004F5C05 /* ViewController.swift in Sources */,
 				E1B747C41D352133008C0F74 /* Geometry.swift in Sources */,
 				E1F7BF351D352E0200C6622B /* TerrainViewOSX.swift in Sources */,
@@ -240,6 +245,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E16B63221D368409009EA105 /* QuadTreeTerrain.swift in Sources */,
 				F730AB021C26E0DF0035F2E9 /* SimpleTerrainView.swift in Sources */,
 				E1F7BF321D352C3900C6622B /* TerrainRenderer.swift in Sources */,
 				E149FAA31CA99C4600B73248 /* Geometry.swift in Sources */,
