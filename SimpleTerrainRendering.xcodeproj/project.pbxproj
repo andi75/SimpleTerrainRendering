@@ -7,8 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E1444B1F1D3276D5004F5C05 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1444B1E1D3276D5004F5C05 /* AppDelegate.swift */; };
+		E1444B211D3276D5004F5C05 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1444B201D3276D5004F5C05 /* ViewController.swift */; };
+		E1444B231D3276D5004F5C05 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1444B221D3276D5004F5C05 /* Assets.xcassets */; };
+		E1444B261D3276D5004F5C05 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1444B241D3276D5004F5C05 /* Main.storyboard */; };
 		E149FAA31CA99C4600B73248 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E149FAA21CA99C4600B73248 /* Geometry.swift */; };
 		E166887C1C2967E400B7C336 /* TerrainCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = E166887B1C2967E400B7C336 /* TerrainCamera.swift */; };
+		E1B747C31D352130008C0F74 /* TerrainData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DD22321C26BE740082EA63 /* TerrainData.swift */; };
+		E1B747C41D352133008C0F74 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E149FAA21CA99C4600B73248 /* Geometry.swift */; };
+		E1B747C51D352136008C0F74 /* TerrainCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = E166887B1C2967E400B7C336 /* TerrainCamera.swift */; };
+		E1F7BF321D352C3900C6622B /* TerrainRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F7BF311D352C3900C6622B /* TerrainRenderer.swift */; };
+		E1F7BF331D352D8000C6622B /* TerrainRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F7BF311D352C3900C6622B /* TerrainRenderer.swift */; };
+		E1F7BF351D352E0200C6622B /* TerrainViewOSX.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F7BF341D352E0200C6622B /* TerrainViewOSX.swift */; };
 		F730AB021C26E0DF0035F2E9 /* SimpleTerrainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */; };
 		F7DD22211C26BE390082EA63 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DD22201C26BE390082EA63 /* AppDelegate.swift */; };
 		F7DD22231C26BE390082EA63 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DD22221C26BE390082EA63 /* ViewController.swift */; };
@@ -19,20 +29,35 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E1444B1C1D3276D5004F5C05 /* SimpleTerrainOSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimpleTerrainOSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1444B1E1D3276D5004F5C05 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E1444B201D3276D5004F5C05 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		E1444B221D3276D5004F5C05 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E1444B251D3276D5004F5C05 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		E1444B271D3276D5004F5C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E149FAA21CA99C4600B73248 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		E166887B1C2967E400B7C336 /* TerrainCamera.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerrainCamera.swift; sourceTree = "<group>"; };
-		F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleTerrainView.swift; sourceTree = "<group>"; };
-		F7DD221D1C26BE390082EA63 /* SimpleTerrainRendering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimpleTerrainRendering.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F7DD22201C26BE390082EA63 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F7DD22221C26BE390082EA63 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		E1F7BF311D352C3900C6622B /* TerrainRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerrainRenderer.swift; sourceTree = "<group>"; };
+		E1F7BF341D352E0200C6622B /* TerrainViewOSX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerrainViewOSX.swift; sourceTree = "<group>"; };
+		F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SimpleTerrainView.swift; path = SimpleTerrainRendering/SimpleTerrainView.swift; sourceTree = "<group>"; };
+		F7DD221D1C26BE390082EA63 /* SimpleTerrainIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimpleTerrainIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F7DD22201C26BE390082EA63 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = SimpleTerrainRendering/AppDelegate.swift; sourceTree = "<group>"; };
+		F7DD22221C26BE390082EA63 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = SimpleTerrainRendering/ViewController.swift; sourceTree = "<group>"; };
 		F7DD22251C26BE390082EA63 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		F7DD22271C26BE390082EA63 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F7DD22271C26BE390082EA63 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = SimpleTerrainRendering/Assets.xcassets; sourceTree = "<group>"; };
 		F7DD222A1C26BE390082EA63 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		F7DD222C1C26BE390082EA63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F7DD222C1C26BE390082EA63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = SimpleTerrainRendering/Info.plist; sourceTree = "<group>"; };
 		F7DD22321C26BE740082EA63 /* TerrainData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TerrainData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		E1444B191D3276D5004F5C05 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F7DD221A1C26BE390082EA63 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -43,10 +68,39 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E1444B1D1D3276D5004F5C05 /* SimpleTerrainOSX */ = {
+			isa = PBXGroup;
+			children = (
+				E1444B1E1D3276D5004F5C05 /* AppDelegate.swift */,
+				E1444B201D3276D5004F5C05 /* ViewController.swift */,
+				E1444B221D3276D5004F5C05 /* Assets.xcassets */,
+				E1444B241D3276D5004F5C05 /* Main.storyboard */,
+				E1444B271D3276D5004F5C05 /* Info.plist */,
+				E1F7BF341D352E0200C6622B /* TerrainViewOSX.swift */,
+			);
+			path = SimpleTerrainOSX;
+			sourceTree = "<group>";
+		};
+		E1B747C21D3520E8008C0F74 /* SimpleTerrainIOS */ = {
+			isa = PBXGroup;
+			children = (
+				F7DD22201C26BE390082EA63 /* AppDelegate.swift */,
+				F7DD22221C26BE390082EA63 /* ViewController.swift */,
+				F7DD22241C26BE390082EA63 /* Main.storyboard */,
+				F7DD22271C26BE390082EA63 /* Assets.xcassets */,
+				F7DD22291C26BE390082EA63 /* LaunchScreen.storyboard */,
+				F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */,
+				F7DD222C1C26BE390082EA63 /* Info.plist */,
+			);
+			name = SimpleTerrainIOS;
+			sourceTree = "<group>";
+		};
 		F7DD22141C26BE380082EA63 = {
 			isa = PBXGroup;
 			children = (
+				E1B747C21D3520E8008C0F74 /* SimpleTerrainIOS */,
 				F7DD221F1C26BE390082EA63 /* SimpleTerrainRendering */,
+				E1444B1D1D3276D5004F5C05 /* SimpleTerrainOSX */,
 				F7DD221E1C26BE390082EA63 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,7 +108,8 @@
 		F7DD221E1C26BE390082EA63 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F7DD221D1C26BE390082EA63 /* SimpleTerrainRendering.app */,
+				F7DD221D1C26BE390082EA63 /* SimpleTerrainIOS.app */,
+				E1444B1C1D3276D5004F5C05 /* SimpleTerrainOSX.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -62,16 +117,10 @@
 		F7DD221F1C26BE390082EA63 /* SimpleTerrainRendering */ = {
 			isa = PBXGroup;
 			children = (
-				F7DD22201C26BE390082EA63 /* AppDelegate.swift */,
-				F7DD22221C26BE390082EA63 /* ViewController.swift */,
-				F7DD22241C26BE390082EA63 /* Main.storyboard */,
 				F7DD22321C26BE740082EA63 /* TerrainData.swift */,
-				F7DD22271C26BE390082EA63 /* Assets.xcassets */,
-				F7DD22291C26BE390082EA63 /* LaunchScreen.storyboard */,
-				F7DD222C1C26BE390082EA63 /* Info.plist */,
-				F730AB011C26E0DF0035F2E9 /* SimpleTerrainView.swift */,
 				E149FAA21CA99C4600B73248 /* Geometry.swift */,
 				E166887B1C2967E400B7C336 /* TerrainCamera.swift */,
+				E1F7BF311D352C3900C6622B /* TerrainRenderer.swift */,
 			);
 			path = SimpleTerrainRendering;
 			sourceTree = "<group>";
@@ -79,9 +128,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		F7DD221C1C26BE390082EA63 /* SimpleTerrainRendering */ = {
+		E1444B1B1D3276D5004F5C05 /* SimpleTerrainOSX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F7DD222F1C26BE390082EA63 /* Build configuration list for PBXNativeTarget "SimpleTerrainRendering" */;
+			buildConfigurationList = E1444B2A1D3276D5004F5C05 /* Build configuration list for PBXNativeTarget "SimpleTerrainOSX" */;
+			buildPhases = (
+				E1444B181D3276D5004F5C05 /* Sources */,
+				E1444B191D3276D5004F5C05 /* Frameworks */,
+				E1444B1A1D3276D5004F5C05 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SimpleTerrainOSX;
+			productName = SimpleTerrainOSX;
+			productReference = E1444B1C1D3276D5004F5C05 /* SimpleTerrainOSX.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F7DD221C1C26BE390082EA63 /* SimpleTerrainIOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F7DD222F1C26BE390082EA63 /* Build configuration list for PBXNativeTarget "SimpleTerrainIOS" */;
 			buildPhases = (
 				F7DD22191C26BE390082EA63 /* Sources */,
 				F7DD221A1C26BE390082EA63 /* Frameworks */,
@@ -91,9 +157,9 @@
 			);
 			dependencies = (
 			);
-			name = SimpleTerrainRendering;
+			name = SimpleTerrainIOS;
 			productName = SimpleTerrainRendering;
-			productReference = F7DD221D1C26BE390082EA63 /* SimpleTerrainRendering.app */;
+			productReference = F7DD221D1C26BE390082EA63 /* SimpleTerrainIOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -102,10 +168,13 @@
 		F7DD22151C26BE380082EA63 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0720;
+				LastSwiftUpdateCheck = 0730;
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "Andreas Umbach";
 				TargetAttributes = {
+					E1444B1B1D3276D5004F5C05 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
 					F7DD221C1C26BE390082EA63 = {
 						CreatedOnToolsVersion = 7.2;
 					};
@@ -124,12 +193,22 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F7DD221C1C26BE390082EA63 /* SimpleTerrainRendering */,
+				F7DD221C1C26BE390082EA63 /* SimpleTerrainIOS */,
+				E1444B1B1D3276D5004F5C05 /* SimpleTerrainOSX */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		E1444B1A1D3276D5004F5C05 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1444B231D3276D5004F5C05 /* Assets.xcassets in Resources */,
+				E1444B261D3276D5004F5C05 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F7DD221B1C26BE390082EA63 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -143,11 +222,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		E1444B181D3276D5004F5C05 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1444B211D3276D5004F5C05 /* ViewController.swift in Sources */,
+				E1B747C41D352133008C0F74 /* Geometry.swift in Sources */,
+				E1F7BF351D352E0200C6622B /* TerrainViewOSX.swift in Sources */,
+				E1F7BF331D352D8000C6622B /* TerrainRenderer.swift in Sources */,
+				E1B747C31D352130008C0F74 /* TerrainData.swift in Sources */,
+				E1B747C51D352136008C0F74 /* TerrainCamera.swift in Sources */,
+				E1444B1F1D3276D5004F5C05 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F7DD22191C26BE390082EA63 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				F730AB021C26E0DF0035F2E9 /* SimpleTerrainView.swift in Sources */,
+				E1F7BF321D352C3900C6622B /* TerrainRenderer.swift in Sources */,
 				E149FAA31CA99C4600B73248 /* Geometry.swift in Sources */,
 				F7DD22231C26BE390082EA63 /* ViewController.swift in Sources */,
 				F7DD22331C26BE740082EA63 /* TerrainData.swift in Sources */,
@@ -159,12 +253,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		E1444B241D3276D5004F5C05 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E1444B251D3276D5004F5C05 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 		F7DD22241C26BE390082EA63 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				F7DD22251C26BE390082EA63 /* Base */,
 			);
 			name = Main.storyboard;
+			path = SimpleTerrainRendering;
 			sourceTree = "<group>";
 		};
 		F7DD22291C26BE390082EA63 /* LaunchScreen.storyboard */ = {
@@ -173,11 +276,44 @@
 				F7DD222A1C26BE390082EA63 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			path = SimpleTerrainRendering;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		E1444B281D3276D5004F5C05 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = SimpleTerrainOSX/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = umbach.ch.SimpleTerrainOSX;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		E1444B291D3276D5004F5C05 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = SimpleTerrainOSX/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = umbach.ch.SimpleTerrainOSX;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 		F7DD222D1C26BE390082EA63 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -267,7 +403,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SimpleTerrainRendering/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = ch.umbach.SimpleTerrainRendering;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.umbach.SimpleTerrainIOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -278,7 +414,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SimpleTerrainRendering/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = ch.umbach.SimpleTerrainRendering;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.umbach.SimpleTerrainIOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -286,6 +422,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		E1444B2A1D3276D5004F5C05 /* Build configuration list for PBXNativeTarget "SimpleTerrainOSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E1444B281D3276D5004F5C05 /* Debug */,
+				E1444B291D3276D5004F5C05 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F7DD22181C26BE380082EA63 /* Build configuration list for PBXProject "SimpleTerrainRendering" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -295,7 +440,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F7DD222F1C26BE390082EA63 /* Build configuration list for PBXNativeTarget "SimpleTerrainRendering" */ = {
+		F7DD222F1C26BE390082EA63 /* Build configuration list for PBXNativeTarget "SimpleTerrainIOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F7DD22301C26BE390082EA63 /* Debug */,
