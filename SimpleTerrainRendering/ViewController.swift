@@ -23,6 +23,8 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var lastZoom : Float = 1
     
+    let qt = QuadTreeTerrain(maxLevel: 7)
+    
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         if(
             (gestureRecognizer == singlePan && otherGestureRecognizer == doublePan) ||
@@ -33,19 +35,21 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         }
         return false;
     }
+    
+    func recreateTerrain()
+    {
+        TerrainFactory.recreateQuadTerrain(self.qt)
+        terrainView!.renderer.xyScale = 1
+        terrainView!.renderer.data = TerrainData(qt: qt, level: qt.maxLevel)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        let terrain = TerrainData(width: 128, height: 128)
-        terrain.randomize(min: 0, max: 15)
-        terrain.smooth()
+        
+        recreateTerrain()
         
         terrainView!.context = EAGLContext(API: .OpenGLES1)
-
-        terrainView!.renderer.data = terrain
-        terrainView.renderer.hmax = 8;
-        terrainView.renderer.hmin = 2;
-        
-        terrainView!.renderer.cam = TerrainCamera(terrain: terrain)
+        terrainView!.renderer.cam = TerrainCamera(terrain: terrainView!.renderer.data!)
         
         singleTap.delaysTouchesBegan = true
         doubleTap.delaysTouchesBegan = true
@@ -79,8 +83,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     @IBAction func viewDoubletapped(sender: UITapGestureRecognizer) {
-        terrainView.renderer.data?.randomize(min: 0, max: 15)
-        terrainView.renderer.data?.smooth()
+        recreateTerrain()
         terrainView.setNeedsDisplay()
         print("randomized")
     }

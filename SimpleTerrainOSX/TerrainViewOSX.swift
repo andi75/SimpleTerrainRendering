@@ -14,7 +14,7 @@ class TerrainViewOSX : NSOpenGLView
     override var acceptsFirstResponder: Bool { return true }
     
     let renderer = TerrainRenderer()
-    let qt = QuadTreeTerrain(maxLevel: 7)
+    let qt = QuadTreeTerrain(maxLevel: 8)
     var qtDisplayLevel : Int = 0
     
     var mousePosition : CGPoint = CGPointMake(0, 0)
@@ -27,18 +27,7 @@ class TerrainViewOSX : NSOpenGLView
     
     func recreateTerrain()
     {
-        var maxNoise : Float = 15.0
-        for level in 0..<qt.maxLevel
-        {
-            qt.copyFromUpperLevel(level)
-            qt.addRandomNoiseToLevel(level + 1, maxNoise: maxNoise)
-            maxNoise *= 0.4
-        }
-        for level in 0...qt.maxLevel
-        {
-            qt.crop(level, minHeight: 1.5, maxHeight: 100)
-        }
-        
+        TerrainFactory.recreateQuadTerrain(qt)
         qtDisplayLevel = qt.maxLevel
         renderer.xyScale = 1
         renderer.data = TerrainData(qt: qt, level: qtDisplayLevel)
@@ -114,20 +103,11 @@ class TerrainViewOSX : NSOpenGLView
             
         case "t": renderer.triangulationType = (renderer.triangulationType + 1) % 3
         case "r": renderer.isWireframe = !renderer.isWireframe
+        case "f": renderer.isCameraLight = !renderer.isCameraLight
             
-        case "z": renderer.data?.smooth()
-        case "x": renderer.data?.randomize(min: 0, max: 15)
-            
-        case "+":
-            let w = renderer.data!.width * 2
-            let h = renderer.data!.height * 2
-            renderer.data = TerrainData(width: w, height: h)
-            renderer.data?.randomize(min: 0, max: 15)
-        case "-":
-            let w = renderer.data!.width / 2
-            let h = renderer.data!.height / 2
-            renderer.data = TerrainData(width: w, height: h)
-            renderer.data?.randomize(min: 0, max: 15)
+        case "z":
+            renderer.data?.smooth()
+            renderer.invalidateGeometry()
             
         case "u":
             recreateTerrain()
@@ -143,6 +123,8 @@ class TerrainViewOSX : NSOpenGLView
             renderer.zScale *= 1.1
         case "h":
             renderer.zScale *= 1.0 / 1.1
+        case "n":
+            renderer.showDebugNormals = !renderer.showDebugNormals
         default:
             Swift.print("unrecognized input: \(s)")
             break

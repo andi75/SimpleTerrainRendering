@@ -32,17 +32,51 @@ class TerrainRenderer
     var vertexCount : Int = 0
     var normalVertexcount : Int = 0
     var primitiveCount : Int = 0
-    var indicesPerPrimitive : Int = 0
     
-    var xyScale : Float = 1.0
-    var zScale : Float = 1.0
+    var xyScale : Float = 1.0 {
+        didSet {
+            isValidGeometry = false
+        }
+    }
+    var zScale : Float = 1.0 {
+        didSet {
+            isValidGeometry = false
+        }
+    }
     
-    var data : TerrainData? = nil
+    var data : TerrainData? = nil {
+        didSet {
+            isValidGeometry = false
+            isValidIndices = false
+        }
+    }
     
-    var isWireframe = false
-    var triangulationType = 0
+    var isWireframe = false {
+        didSet {
+            isValidIndices = false
+        }
+    }
+    var triangulationType = 0 {
+        didSet {
+            isValidIndices = false
+        }
+    }
+    
+    var showDebugNormals = false
+    
+    var isValidGeometry = false
+    var isValidIndices = false
+    
+    var isCameraLight = true
     
     var cam : TerrainCamera? = nil
+    
+    func invalidateGeometry() { isValidGeometry = false }
+    func invalidateIndices() { isValidIndices = false }
+    func invalidateGeometryAndIndices() {
+        isValidGeometry = false
+        isValidIndices = false
+    }
     
     func render(width width : CGFloat, height : CGFloat) {
 //        print("render() called")
@@ -94,25 +128,115 @@ class TerrainRenderer
         glLoadIdentity()
         
         let lightpos : [Float] = [ 0, 0, 1, 0 ]
-        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_POSITION), lightpos)
         
-        glLoadMatrixf(glMatrix(camMatrix))
-        
-        // simpleTriangle()
-        createTerrainGeometry(terrain)
-        renderTerrainGeometry()
-        // drawCamera(self.cam!)
-        
-        let hitResult = terrain.intersectWithRay(self.cam!.eye, direction: self.cam!.viewDir)
-        if(hitResult.isHit)
+        if(isCameraLight)
         {
-            //            print("hit from \(GLKV3toString(self.cam!.eye)) in direction \(GLKV3toString(self.cam!.viewDir)) at \(GLKV3toString(hitResult.location))")
-            simpleTetrahedron(0.1, location: hitResult.location)
+            glLightfv( GLenum(GL_LIGHT0), GLenum(GL_POSITION), lightpos)
         }
+        glLoadMatrixf(glMatrix(camMatrix))
+        if(!isCameraLight)
+        {
+            glLightfv( GLenum(GL_LIGHT0), GLenum(GL_POSITION), lightpos)
+        }
+        
+        // TODO: call this function only when the geometry has changed
+        createGeometry()
+
+        renderTerrainGeometry()
+        
+//        let hitResult = terrain.intersectWithRay(self.cam!.eye, direction: self.cam!.viewDir)
+//        if(hitResult.isHit)
+//        {
+//            //            print("hit from \(GLKV3toString(self.cam!.eye)) in direction \(GLKV3toString(self.cam!.viewDir)) at \(GLKV3toString(hitResult.location))")
+//            simpleTetrahedron(0.1, location: hitResult.location)
+//        }
+    }
+
+    func createGeometry()
+    {
+        if(!isValidGeometry)
+        {
+            self.vertices = TerrainRenderer.createVertexGeometry(self.data!, xyScale: xyScale, zScale: zScale)
+            self.vertexCount = self.vertices!.count / 3
+            
+            self.normals = TerrainRenderer.createNormalGeometry(self.data!, xyScale: xyScale, zScale: zScale)
+            self.colors = TerrainRenderer.createVertexColors(self.data!)
+            
+            createDebugNormalGeometry()
+            
+            isValidGeometry = true
+        }
+        if(!isValidIndices)
+        {
+            if(self.isWireframe)
+            {
+                self.indices = TerrainRenderer.createWireframeIndices(self.data!, triangulationType: self.triangulationType)
+                self.primitiveCount = self.indices!.count / 2
+            }
+            else
+            {
+                self.indices = TerrainRenderer.createTriangleIndices(self.data!, triangulationType: self.triangulationType)
+                self.primitiveCount = self.indices!.count / 3
+            }
+            isValidIndices = true
+        }
+
+
     }
     
-    func createFaceNormals(vertices: [Float], indices: [Int32]) -> [Float]
+    class func terrainColorA(t : Float) -> [Float]
     {
+        let color : [Float] = [ 1, 1, 1, 1 ]
+        // 0: blue
+        if(t < 0.05) { return [ 0, 0, 1, 1 ] }
+        if(t < 0.4) { return [ 0, 0.8, 0, 1] }
+        if(t < 0.6) { return [ 0.4, 0.4, 0, 1 ] }
+        if(t < 0.8) { return [ 0.3, 0.3, 0.3, 1 ] }
+        return color
+    }
+    class func terrainColorB(t : Float) -> [Float]
+    {
+        let color : [Float] = [ 1, 1, 1, 1 ]
+        // 0: blue
+        if(t < 0.05) { return [ 0, 0, 1, 1 ] }
+        if(t < 0.3) { return [ 0, 0.8, 0, 1] }
+        if(t < 0.5) { return [ 0.4, 0.4, 0, 1 ] }
+        if(t < 0.7) { return [ 0.3, 0.3, 0.3, 1 ] }
+        return color
+    }
+
+    class func createVertexColors(terrain: TerrainData) -> [Float]
+    {
+        let min = terrain.minHeight
+        let max = terrain.maxHeight
+        
+        var colors : [Float] = [Float](count: terrain.width * terrain.height * 4, repeatedValue: 1.0)
+        for y in 0 ..< terrain.height
+        {
+            for x in 0 ..< terrain.width
+            {
+                let vertex = (y * terrain.width + x)
+                let t = (terrain.data[vertex] - min) / (max - min)
+
+                let colorA = TerrainRenderer.terrainColorA(t)
+                let colorB = TerrainRenderer.terrainColorB(t + (Float(random()) / Float(RAND_MAX)) * 0.04 )
+
+                for i in 0..<4
+                {
+                    colors[4 * vertex + i] = 0.5 * (colorA[i] + colorB[i])
+                }
+//                colors[4 * vertex + 0] = Float(x) / Float(terrain.width) // base + (1 - base) * terrainValue
+//                colors[4 * vertex + 1] = Float(y) / Float(terrain.height) // base + (1 - base) * terrainValue
+//                colors[4 * vertex + 2] = 1
+//                colors[4 * vertex + 3] = 1 // alpha
+            }
+        }
+        return colors
+    }
+
+    class func createFaceNormals(vertices: [Float], indices: [Int32]) -> [Float]
+    {
+        // TODO: This function is not used yet
         let nFaces : Int = indices.count / 3
         
         var faceNormals : [Float] = [Float](count: 3 * nFaces, repeatedValue: 0)
@@ -145,10 +269,10 @@ class TerrainRenderer
     
     func createShadowGeometry(vertices: [Float], indices: [Int32], faceNormals: [Float], lightDirection: GLKVector3)
     {
-        
+        // TODO
     }
     
-    func createVertexGeometry(terrain: TerrainData) -> [Float]
+    class func createVertexGeometry(terrain: TerrainData, xyScale : Float, zScale : Float) -> [Float]
     {
         let vertexCount = terrain.width * terrain.height
         
@@ -159,15 +283,15 @@ class TerrainRenderer
             for x in 0 ..< terrain.width
             {
                 let vertex = (y * terrain.width + x)
-                vertices[3 * vertex + 0] = Float(x) // TODO: xyScale
-                vertices[3 * vertex + 1] = Float(y)
-                vertices[3 * vertex + 2] = terrain.data[vertex] // TODO: zScale
+                vertices[3 * vertex + 0] = Float(x) * xyScale
+                vertices[3 * vertex + 1] = Float(y) * xyScale
+                vertices[3 * vertex + 2] = terrain.data[vertex] * zScale
             }
         }
         return vertices
     }
     
-    func createNormalGeometry(terrain: TerrainData) -> [Float]
+    class func createNormalGeometry(terrain: TerrainData, xyScale: Float, zScale: Float) -> [Float]
     {
         let vertexCount = terrain.width * terrain.height
         
@@ -188,8 +312,8 @@ class TerrainRenderer
                 let vpostx = (y * terrain.width + postx)
                 let vprey = (prefy * terrain.width + x)
                 let vposty = (posty * terrain.width + x)
-                let vdx = GLKVector3(v: (2, 0, terrain.data[vpostx] - terrain.data[vprex]) )
-                let vdy = GLKVector3(v: (0, 2, terrain.data[vposty] - terrain.data[vprey]) )
+                let vdx = GLKVector3(v: (2 * xyScale, 0, (terrain.data[vpostx] - terrain.data[vprex]) * zScale) )
+                let vdy = GLKVector3(v: (0, 2 * xyScale, (terrain.data[vposty] - terrain.data[vprey]) * zScale) )
                 let vTemp = GLKVector3CrossProduct(vdx, vdy)
                 let vNormal = GLKVector3Normalize(vTemp)
                 
@@ -200,7 +324,64 @@ class TerrainRenderer
         return normals
     }
     
-    func createTriangleIndices(terrain: TerrainData) -> [UInt32]
+    class func createWireframeIndices(terrain: TerrainData, triangulationType: Int) -> [UInt32]
+    {
+        let primitiveCount = (terrain.width - 1) * (terrain.height - 1) * 5
+        var indices : [UInt32] = [UInt32](count: primitiveCount * 2, repeatedValue: 0)
+        
+        var primitive = 0;
+        
+        for y in 0 ..< (terrain.height - 1)
+        {
+            for x in 0 ..< (terrain.width - 1)
+            {
+                let v1 = (y + 0) * terrain.width + (x + 0)
+                let v2 = (y + 0) * terrain.width + (x + 1)
+                let v3 = (y + 1) * terrain.width + (x + 0)
+                let v4 = (y + 1) * terrain.width + (x + 1)
+                
+                let d14 = abs(terrain.data[v1] - terrain.data[v4])
+                let d23 = abs(terrain.data[v2] - terrain.data[v3])
+                
+                let wireframe2 =
+                    (d14 < d23) ?
+                        // ((x + y) % 2 == 0) ?
+                        [ v1, v2, v1, v3, v2, v4, v3, v4, v1, v4 ]  :
+                        [ v1, v2, v1, v3, v2, v4, v3, v4, v2, v3 ];
+                
+                let wireframe1 = ((x + y) % 2 == 0) ?
+                    [ v1, v2, v1, v3, v2, v4, v3, v4, v1, v4 ]  :
+                    [ v1, v2, v1, v3, v2, v4, v3, v4, v2, v3 ];
+                
+                let wireframe0 = [ v1, v2, v1, v3, v2, v4, v3, v4, v1, v4 ];
+                
+                var wireframe : [Int]
+                
+                switch(triangulationType)
+                {
+                case 0: wireframe = wireframe0
+                case 1: wireframe = wireframe1
+                case 2: wireframe = wireframe2
+                default: wireframe = wireframe0
+                    print("not supposed to happen")
+                }
+                
+                for i in 0 ..< 5
+                {
+                    for j in 0 ..< 2
+                    {
+                        indices[2 * primitive + j] = UInt32(wireframe[2 * i + j])
+                    }
+                    primitive += 1
+                }
+                // TODO: Create adjacency
+            }
+        }
+        return indices
+        
+    }
+    
+    class func createTriangleIndices(terrain: TerrainData, triangulationType: Int) -> [UInt32]
     {
         let primitiveCount = (terrain.width - 1) * (terrain.height - 1) * 2
         var indices : [UInt32] = [UInt32](count: primitiveCount * 3, repeatedValue: 0)
@@ -231,7 +412,7 @@ class TerrainRenderer
                 
                 var solid : [Int]
                 
-                switch(self.triangulationType)
+                switch(triangulationType)
                 {
                 case 0: solid = solid0
                 case 1: solid = solid1
@@ -252,161 +433,13 @@ class TerrainRenderer
         return indices
     }
     
-    func createTerrainGeometry(terrain: TerrainData)
+    func createDebugNormalGeometry()
     {
-        
-        self.vertexCount = terrain.width * terrain.height
-        self.primitiveCount = self.isWireframe ?
-            (terrain.width - 1) * (terrain.height - 1) * 5 :
-            (terrain.width - 1) * (terrain.height - 1) * 2
-        
-        self.indicesPerPrimitive = self.isWireframe ? 2 : 3
-        
-        vertices = [Float](count: vertexCount * 3, repeatedValue: 0.0)
-        normals = [Float](count: vertexCount * 3, repeatedValue: 0.0)
-        normalColors = [Float](count: vertexCount * 8, repeatedValue: 0.0)
-        colors = [Float](count: vertexCount * 4, repeatedValue: 0.0)
-        
-        self.indices = [UInt32](count: self.primitiveCount * self.indicesPerPrimitive, repeatedValue: 0)
-        
-        for y in 0 ..< terrain.height
-        {
-            for x in 0 ..< terrain.width
-            {
-                let vertex = (y * terrain.width + x)
-                self.vertices![3 * vertex + 0] = Float(x) * xyScale
-                self.vertices![3 * vertex + 1] = Float(y) * xyScale
-                self.vertices![3 * vertex + 2] = terrain.data[vertex] * zScale
-                
-                // normals
-                let prefx = max(0, x - 1)
-                let postx = min(x + 1, terrain.width - 1)
-                let prefy = max(0, y - 1)
-                let posty = min(y + 1, terrain.height - 1)
-                
-                let vprex = (y * terrain.width + prefx)
-                let vpostx = (y * terrain.width + postx)
-                let vprey = (prefy * terrain.width + x)
-                let vposty = (posty * terrain.width + x)
-                let vdx = GLKVector3(v: (2, 0, terrain.data[vpostx] - terrain.data[vprex]) )
-                let vdy = GLKVector3(v: (0, 2, terrain.data[vposty] - terrain.data[vprey]) )
-                let vTemp = GLKVector3CrossProduct(vdx, vdy)
-                let vNormal = GLKVector3Normalize(vTemp)
-                
-                self.normals![3 * vertex + 0] = vNormal.x
-                self.normals![3 * vertex + 1] = vNormal.y
-                self.normals![3 * vertex + 2] = vNormal.z
-                
-                self.colors![4 * vertex + 0] = Float(x) / Float(terrain.width) // base + (1 - base) * terrainValue
-                self.colors![4 * vertex + 1] = Float(y) / Float(terrain.height) // base + (1 - base) * terrainValue
-                self.colors![4 * vertex + 2] = 1
-                
-                self.colors![4 * vertex + 3] = 1 // alpha
-            }
-        }
-        
-        self.colors![4 * 0 + 0] = 1;
-        self.colors![4 * 0 + 1] = 1;
-        self.colors![4 * 0 + 2] = 0;
-        self.colors![4 * 0 + 3] = 1;
-        
-        self.colors![4 * (terrain.width - 1) + 0] = 1;
-        self.colors![4 * (terrain.width - 1) + 1] = 0;
-        self.colors![4 * (terrain.width - 1) + 2] = 0;
-        self.colors![4 * (terrain.width - 1) + 3] = 1;
-        
-        self.colors![4 * (terrain.width * (terrain.height - 1)) + 0] = 0;
-        self.colors![4 * (terrain.width * (terrain.height - 1)) + 1] = 1;
-        self.colors![4 * (terrain.width * (terrain.height - 1)) + 2] = 0;
-        self.colors![4 * (terrain.width * (terrain.height - 1)) + 3] = 1;
-        
-        var triangle = 0;
-        
-        for y in 0 ..< (terrain.height - 1)
-        {
-            for x in 0 ..< (terrain.width - 1)
-            {
-                let v1 = UInt32( (y + 0) * terrain.width + (x + 0) )
-                let v2 = UInt32( (y + 0) * terrain.width + (x + 1) )
-                let v3 = UInt32( (y + 1) * terrain.width + (x + 0) )
-                let v4 = UInt32( (y + 1) * terrain.width + (x + 1) )
-                
-                let d14 = abs(self.vertices![3 * Int(v1) + 2] - self.vertices![3 * Int(v4) + 2])
-                let d23 = abs(self.vertices![3 * Int(v2) + 2] - self.vertices![3 * Int(v3) + 2])
-                
-                let wireframe2 =
-                    (d14 < d23) ?
-                        
-                        // ((x + y) % 2 == 0) ?
-                        [ v1, v2, v1, v3, v2, v4, v3, v4, v1, v4 ]  :
-                        [ v1, v2, v1, v3, v2, v4, v3, v4, v2, v3 ];
-                
-                let wireframe1 = ((x + y) % 2 == 0) ?
-                    [ v1, v2, v1, v3, v2, v4, v3, v4, v1, v4 ]  :
-                    [ v1, v2, v1, v3, v2, v4, v3, v4, v2, v3 ];
-                
-                let wireframe0 = [ v1, v2, v1, v3, v2, v4, v3, v4, v1, v4 ];
-                
-                let solid2 = (d14 < d23) ?
-                    [ v1, v2, v3, v2, v4, v3 ] :
-                    [ v1, v2, v4, v1, v4, v3 ];
-                
-                let solid1 = ((x + y) % 2 == 0) ?
-                    [ v1, v2, v3, v2, v4, v3 ] :
-                    [ v1, v2, v4, v1, v4, v3 ];
-                
-                let solid0 = [ v1, v2, v3, v2, v4, v3 ]
-                
-                var wireframe : [UInt32]
-                var solid : [UInt32]
-                
-                switch(self.triangulationType)
-                {
-                case 0:
-                    wireframe = wireframe0
-                    solid = solid0
-                case 1:
-                    wireframe = wireframe1
-                    solid = solid1
-                case 2:
-                    wireframe = wireframe2
-                    solid = solid2
-                default:
-                    wireframe = wireframe0
-                    solid = solid0
-                    print("not supposed to happen")
-                }
-                
-                if(self.isWireframe)
-                {
-                    
-                    for i in 0 ..< 5
-                    {
-                        for j in 0 ..< 2
-                        {
-                            self.indices![2 * triangle + j] = wireframe[2 * i + j]
-                        }
-                        triangle += 1
-                    }
-                }
-                else
-                {
-                    for i in 0 ..< 6
-                    {
-                        self.indices![3 * triangle + i] = solid[i]
-                    }
-                    triangle += 2
-                }
-                
-            }
-        }
-        //        print("indices: \(indices)")
-        //        print("vertices: \(vertices)")
-        //        print("colors: \(colors)")
-        
         self.normalVertexcount = 2 * self.vertexCount
         self.normalVertices = [Float](count: self.normalVertexcount * 3, repeatedValue: 0.0)
-        for i in 0 ..< vertexCount
+        self.normalColors = [Float](count: self.normalVertexcount * 4, repeatedValue: 0.0)
+        
+        for i in 0 ..< self.vertexCount
         {
             normalVertices![6 * i + 0] = self.vertices![3 * i + 0];
             normalVertices![6 * i + 1] = self.vertices![3 * i + 1];
@@ -471,14 +504,16 @@ class TerrainRenderer
         glDisable( GLenum(GL_LIGHT0) )
         glDisable( GLenum(GL_LIGHTING) )
         
-        glVertexPointer(3, GLenum(GL_FLOAT), 0, self.normalVertices!)
-        glColorPointer(4, GLenum(GL_FLOAT), 0, self.normalColors!)
-        glEnableClientState(GLenum(GL_VERTEX_ARRAY))
-        glEnableClientState(GLenum(GL_COLOR_ARRAY))
-        // glDrawArrays(GLenum(GL_LINES), 0, GLsizei(self.normalVertexcount))
-        glDisableClientState(GLenum(GL_COLOR_ARRAY))
-        glDisableClientState(GLenum(GL_VERTEX_ARRAY))
-        
+        if(self.showDebugNormals)
+        {
+            glVertexPointer(3, GLenum(GL_FLOAT), 0, self.normalVertices!)
+            glColorPointer(4, GLenum(GL_FLOAT), 0, self.normalColors!)
+            glEnableClientState(GLenum(GL_VERTEX_ARRAY))
+            glEnableClientState(GLenum(GL_COLOR_ARRAY))
+            glDrawArrays(GLenum(GL_LINES), 0, GLsizei(self.normalVertexcount))
+            glDisableClientState(GLenum(GL_COLOR_ARRAY))
+            glDisableClientState(GLenum(GL_VERTEX_ARRAY))
+        }
     }
     
     
