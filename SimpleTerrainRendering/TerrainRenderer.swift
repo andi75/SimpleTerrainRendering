@@ -39,9 +39,6 @@ class TerrainRenderer
     
     var data : TerrainData? = nil
     
-    var hmin : Float = 0
-    var hmax : Float = 1
-    
     var isWireframe = false
     var triangulationType = 0
     
@@ -300,19 +297,11 @@ class TerrainRenderer
                 self.normals![3 * vertex + 1] = vNormal.y
                 self.normals![3 * vertex + 2] = vNormal.z
                 
-                // let base : Float = 0.2
-                // let terrainValue : Float = (terrain.data[vertex] - hmin) / (hmax - hmin)
                 self.colors![4 * vertex + 0] = Float(x) / Float(terrain.width) // base + (1 - base) * terrainValue
                 self.colors![4 * vertex + 1] = Float(y) / Float(terrain.height) // base + (1 - base) * terrainValue
-                self.colors![4 * vertex + 2] = 1 // base + (1 - base) * terrainValue
+                self.colors![4 * vertex + 2] = 1
                 
-                self.colors![4 * vertex + 3] = 1
-                
-                //                if(x % 10 == 0 && y % 10 == 0)
-                //                {
-                //                    simpleTetrahedron(GLKVector3Make(Float(x), Float(y), terrain.data[y * terrain.width + x]))
-                //                }
-                
+                self.colors![4 * vertex + 3] = 1 // alpha
             }
         }
         
@@ -481,9 +470,6 @@ class TerrainRenderer
         
         glDisable( GLenum(GL_LIGHT0) )
         glDisable( GLenum(GL_LIGHTING) )
-        
-        // draw normals
-        // glColor4f(1.0, 0.0, 0.0, 1.0)
         
         glVertexPointer(3, GLenum(GL_FLOAT), 0, self.normalVertices!)
         glColorPointer(4, GLenum(GL_FLOAT), 0, self.normalColors!)

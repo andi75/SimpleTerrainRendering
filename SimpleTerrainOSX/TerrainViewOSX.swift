@@ -14,7 +14,6 @@ class TerrainViewOSX : NSOpenGLView
     override var acceptsFirstResponder: Bool { return true }
     
     let renderer = TerrainRenderer()
-    
     let qt = QuadTreeTerrain(maxLevel: 7)
     var qtDisplayLevel : Int = 0
     
@@ -26,8 +25,31 @@ class TerrainViewOSX : NSOpenGLView
         glFlush()
     }
     
+    func recreateTerrain()
+    {
+        var maxNoise : Float = 15.0
+        for level in 0..<qt.maxLevel
+        {
+            qt.copyFromUpperLevel(level)
+            qt.addRandomNoiseToLevel(level + 1, maxNoise: maxNoise)
+            maxNoise *= 0.4
+        }
+        for level in 0...qt.maxLevel
+        {
+            qt.crop(level, minHeight: 1.5, maxHeight: 100)
+        }
+        
+        qtDisplayLevel = qt.maxLevel
+        renderer.xyScale = 1
+        renderer.data = TerrainData(qt: qt, level: qtDisplayLevel)
+        Swift.print("Height range: \(renderer.data!.minHeight) to \(renderer.data!.maxHeight)")
+    }
+    
     override func viewDidMoveToWindow() {
-        // apparently all the following is unneeded
+        recreateTerrain()
+        renderer.cam = TerrainCamera(terrain: renderer.data!)
+        
+// apparently all the following is unneeded
 //        self.window?.makeKeyWindow()
 //        if(self.window!.makeFirstResponder(self))
 //        {
@@ -108,22 +130,7 @@ class TerrainViewOSX : NSOpenGLView
             renderer.data?.randomize(min: 0, max: 15)
             
         case "u":
-            var maxNoise : Float = 15.0
-            for level in 0..<qt.maxLevel
-            {
-                qt.copyFromUpperLevel(level)
-                qt.addRandomNoiseToLevel(level + 1, maxNoise: maxNoise)
-                maxNoise *= 0.4
-            }
-            for level in 0...qt.maxLevel
-            {
-                qt.crop(level, minHeight: 1.5, maxHeight: 100)
-            }
-            
-            qtDisplayLevel = qt.maxLevel
-            renderer.xyScale = 1
-            renderer.data = TerrainData(qt: qt, level: qtDisplayLevel)
-            Swift.print("Height range: \(renderer.data!.minHeight) to \(renderer.data!.maxHeight)")
+            recreateTerrain()
         case "i":
             qtDisplayLevel = max(qtDisplayLevel - 1, 0)
             renderer.data = TerrainData(qt: qt, level: qtDisplayLevel)
