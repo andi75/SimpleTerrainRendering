@@ -81,7 +81,7 @@ class TerrainRenderer
     func render(width width : CGFloat, height : CGFloat) {
 //        print("render() called")
         
-        glClearColor(0.0, 0.0, 0.5, 0.0)
+        glClearColor(0.3, 0.3, 0.8, 0.0)
 //        glClearColor(1.0, 1.0, 1.0, 0.0)
         glClear( GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  )
         
@@ -184,25 +184,43 @@ class TerrainRenderer
 
     }
     
-    class func terrainColorA(t : Float) -> [Float]
+    class func terrainColor(t : Float) -> [Float]
     {
-        let color : [Float] = [ 1, 1, 1, 1 ]
-        // 0: blue
-        if(t < 0.05) { return [ 0, 0, 1, 1 ] }
-        if(t < 0.4) { return [ 0, 0.8, 0, 1] }
-        if(t < 0.6) { return [ 0.4, 0.4, 0, 1 ] }
-        if(t < 0.8) { return [ 0.3, 0.3, 0.3, 1 ] }
-        return color
-    }
-    class func terrainColorB(t : Float) -> [Float]
-    {
-        let color : [Float] = [ 1, 1, 1, 1 ]
-        // 0: blue
-        if(t < 0.05) { return [ 0, 0, 1, 1 ] }
-        if(t < 0.3) { return [ 0, 0.8, 0, 1] }
-        if(t < 0.5) { return [ 0.4, 0.4, 0, 1 ] }
-        if(t < 0.7) { return [ 0.3, 0.3, 0.3, 1 ] }
-        return color
+        let colorsAndLimits : [(Float, [Float])] = [
+            (0.01, [ 0, 0, 1, 1 ]),
+            (0.04, [ 0, 0.9, 0, 1]),
+            (0.35, [ 0, 0.8, 0, 1]),
+            (0.55, [ 0.4, 0.4, 0, 1 ]),
+            (0.75, [ 0.3, 0.3, 0.3, 1 ]),
+            (0.85, [ 1, 1, 1, 1 ])
+            ]
+        
+        var lastLimit : Float = 0
+        var lastColor : [Float]?
+        
+        for (limit, color) in colorsAndLimits
+        {
+            if(t < limit)
+            {
+                if(lastLimit == 0)
+                {
+                    return color
+                }
+                else
+                {
+                    var interPolatedColor : [Float] = [0, 0, 0, 0]
+                    let tRange = (t - lastLimit) / (limit - lastLimit)
+                    for i in 0..<4
+                    {
+                        interPolatedColor[i] = lastColor![i] * (1 - tRange) + tRange * color[i]
+                    }
+                    return interPolatedColor
+                }
+            }
+            lastColor = color
+            lastLimit = limit
+        }
+        return lastColor!
     }
 
     class func createVertexColors(terrain: TerrainData) -> [Float]
@@ -218,12 +236,11 @@ class TerrainRenderer
                 let vertex = (y * terrain.width + x)
                 let t = (terrain.data[vertex] - min) / (max - min)
 
-                let colorA = TerrainRenderer.terrainColorA(t)
-                let colorB = TerrainRenderer.terrainColorB(t + (Float(random()) / Float(RAND_MAX)) * 0.04 )
+                let color = TerrainRenderer.terrainColor(t)
 
                 for i in 0..<4
                 {
-                    colors[4 * vertex + i] = 0.5 * (colorA[i] + colorB[i])
+                    colors[4 * vertex + i] = color[i]
                 }
 //                colors[4 * vertex + 0] = Float(x) / Float(terrain.width) // base + (1 - base) * terrainValue
 //                colors[4 * vertex + 1] = Float(y) / Float(terrain.height) // base + (1 - base) * terrainValue
@@ -269,7 +286,7 @@ class TerrainRenderer
     
     func createShadowGeometry(vertices: [Float], indices: [Int32], faceNormals: [Float], lightDirection: GLKVector3)
     {
-        // TODO
+        // TODO: totally unfinished
     }
     
     class func createVertexGeometry(terrain: TerrainData, xyScale : Float, zScale : Float) -> [Float]
@@ -460,6 +477,15 @@ class TerrainRenderer
         }
     }
     
+    /**
+     Renders terrain geometry either as triangles or as wireframe.
+     Relies on createVertexGeometry(), createVertexColors(),
+     createNormalGeometry(), and either createTriangleIndices() or
+     createWireframeIndices() being called before
+     
+     Optionally draws normals for debugging (relies on createDebugNormalGeometry()
+     being called before
+     */
     func renderTerrainGeometry()
     {
         glVertexPointer(3, GLenum(GL_FLOAT), 0, self.vertices!)
@@ -519,6 +545,7 @@ class TerrainRenderer
     
     func drawCamera(cam : TerrainCamera)
     {
+        // TODO: untestet, unused
         let upDir = GLKVector3MultiplyScalar(cam.up, 10)
         let upEndPoint = GLKVector3Add(cam.eye, upDir)
         
@@ -545,10 +572,10 @@ class TerrainRenderer
             1, 1, 1, 1,
             0, 1.0, 0, 1
         ]
-        drawAsLines(vertices, colors: colors)
+        TerrainRenderer.drawAsLines(vertices, colors: colors)
     }
     
-    func drawAsLines(vertices : [Float], colors : [Float])
+    class func drawAsLines(vertices : [Float], colors : [Float])
     {
         glVertexPointer(3, GLenum(GL_FLOAT), 0, vertices)
         glColorPointer(4, GLenum(GL_FLOAT), 0, colors)
@@ -559,8 +586,9 @@ class TerrainRenderer
         glDisableClientState(GLenum(GL_VERTEX_ARRAY))
     }
     
-    func simpleTriangle()
+    class func simpleTriangle()
     {
+        // TODO: untestet, unused
         let z : Float = -0.5
         let vertices : [Float] = [ 0, 0, z, 1, 0, z, 0, 1, z]
         let colors : [Float] = [ 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1 ]
@@ -570,14 +598,15 @@ class TerrainRenderer
         glColorPointer(4, GLenum(GL_FLOAT), 0, colors)
         glEnableClientState(GLenum(GL_VERTEX_ARRAY))
         glEnableClientState(GLenum(GL_COLOR_ARRAY))
-        // glDrawArrays(GLenum(GL_TRIANGLES), 0, GLsizei(3))
+        glDrawArrays(GLenum(GL_TRIANGLES), 0, GLsizei(3))
         glDrawElements(GLenum(GL_TRIANGLES), 3, GLenum(GL_UNSIGNED_INT), indices)
         glDisableClientState(GLenum(GL_COLOR_ARRAY))
         glDisableClientState(GLenum(GL_VERTEX_ARRAY))
     }
     
-    func simpleTetrahedron(size : Float, location : GLKVector3)
+    class func simpleTetrahedron(size : Float, location : GLKVector3)
     {
+        // TODO: render edges as well (in a contrast color)
         let cos30 = cos( Float(M_PI / 6.0) )
         let sin30 = sin( Float(M_PI / 6.0) )
         var vertices : [Float] = [
@@ -605,12 +634,13 @@ class TerrainRenderer
         glDisableClientState(GLenum(GL_VERTEX_ARRAY))
     }
     
-    func intersect(origin : GLKVector3, direction : GLKVector3) -> GLKVector3
+    class func intersect(origin : GLKVector3, direction : GLKVector3) -> GLKVector3
     {
         // find the square origion contains
         // check intersection for both triangles in that square
         // advance to next square
         
+        // TODO: totally incomplete, unused
         return GLKVector3Make(0, 0, 0)
     }
 }

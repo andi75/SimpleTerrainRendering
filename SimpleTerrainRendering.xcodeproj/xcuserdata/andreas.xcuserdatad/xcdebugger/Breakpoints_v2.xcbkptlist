@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SimpleTerrainRendering/TerrainRenderer.swift"
-            timestampString = "490222214.473582"
+            timestampString = "490311780.826586"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "240"
-            endingLineNumber = "240"
+            startingLineNumber = "257"
+            endingLineNumber = "257"
             landmarkName = "createFaceNormals(_:indices:)"
             landmarkType = "5">
          </BreakpointContent>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SimpleTerrainRendering/TerrainRenderer.swift"
-            timestampString = "490222214.473582"
+            timestampString = "490311780.826586"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "384"
-            endingLineNumber = "384"
+            startingLineNumber = "401"
+            endingLineNumber = "401"
             landmarkName = "createTriangleIndices(_:triangulationType:)"
             landmarkType = "5">
          </BreakpointContent>

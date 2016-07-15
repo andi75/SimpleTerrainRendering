@@ -10,9 +10,15 @@ import Foundation
 
 class QuadTreeTerrain
 {
-    var data: [Float]
+    var data: [Float] // height information
     var maxLevel : Int
     
+    /**
+     Compute the index where the current level's QuadTree data is stored
+     
+     - returns: index of the first element for the current level's data
+     - paramter level: the current quadtree level
+     */
     class func getOffset(level : Int) -> Int
     {
         var offset = 0
@@ -24,16 +30,37 @@ class QuadTreeTerrain
         return offset
     }
     
+    /**
+     Compute the width (amount of data points per row/column) of the current
+     QuadTree level
+     
+     - returns: amount of data points per row/column
+     - parameter level: the current quadtree level
+     */
     class func getWidth(level : Int) -> Int
     {
         return (1 << level) + 1
     }
     
+    class func getNextLevelXYOrigin(currentLevel: Int, currentX: Int, currentY: Int) -> (nextX: Int, nextY: Int)
+    {
+        let width = QuadTreeTerrain.getWidth(currentLevel)
+        return (nextX: currentX * width, nextY: currentY * width)
+        // TODO: untested
+    }
+    
+    /**
+     Gets the data at the x/y coordinates of the specified level
+     - returns: data at the x/y coordinates of the specified level
+     */
     func getDataAt(level: Int, x: Int, y: Int) -> Float
     {
         return data[QuadTreeTerrain.getOffset(level) + y * QuadTreeTerrain.getWidth(level) + x]
     }
     
+    /**
+     Sets the data at the x/y coordinates of the specified level
+     */
     func setDataAt(level: Int, x: Int, y: Int, value: Float)
     {
         data[QuadTreeTerrain.getOffset(level) + y * QuadTreeTerrain.getWidth(level) + x] = value
@@ -46,6 +73,13 @@ class QuadTreeTerrain
         self.data = [Float](count: size, repeatedValue: 0.0)
     }
     
+    /**
+    Copies data from a higher (coarser) level to a lower level. Data points that are
+    at the same location are unchanged, new data points between old points are
+    linearly interpolated
+     
+    - paramter upperLevel: The level that contains the data to be copied and interpolated
+    */
     func copyFromUpperLevel(upperLevel : Int)
     {
         if(upperLevel >= maxLevel)
@@ -89,6 +123,10 @@ class QuadTreeTerrain
         }
     }
     
+    /**
+     Adds random noise ranging from -maxNoise/2 to maxNoise/2
+     the specified level
+     */
     func addRandomNoiseToLevel(level: Int, maxNoise: Float)
     {
         let curWidth = QuadTreeTerrain.getWidth(level)
@@ -97,12 +135,17 @@ class QuadTreeTerrain
         {
             for x in 0..<curWidth
             {
+                // TODO: it might make sense to change this to maxNoise * rand(-1 from 1)
                 let noise = maxNoise * (0.5 - (Float(random()) / Float(RAND_MAX)))
                 self.setDataAt(level, x: x, y: y,
                                value: noise + self.getDataAt(level, x: x, y: y))
             }
         }
     }
+    /**
+     Crops the data in the specified level to the
+     range [minHeight, maxHeight]
+     */
     func crop(level: Int, minHeight: Float, maxHeight: Float)
     {
         let curWidth = QuadTreeTerrain.getWidth(level)
