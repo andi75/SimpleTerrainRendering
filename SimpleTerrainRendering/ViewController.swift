@@ -6,6 +6,8 @@
 //  Copyright © 2015 Andreas Umbach. All rights reserved.
 //
 
+// TODO: add support for all the keyboard commands from the OSX version
+    
 import UIKit
 
 class ViewController: UIViewController, UIGestureRecognizerDelegate {

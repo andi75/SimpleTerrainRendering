@@ -12,7 +12,14 @@ class TerrainCamera {
     var eye : GLKVector3
     
     var phi : Float = 0.0 // left-right angle, phi = 0 is in x direction, phi = pi/2 is in y direction
-    var chi : Float = 0.0 // up-down angle, chi = pi/2 is in z direction
+    var chi : Float = 0.0
+    {
+        didSet(oldValue)// clamp to -5 Pi/12, 5 Pi/12
+        {
+            chi = max( -5 * Float(M_PI) / 12, min( chi, 5 * Float(M_PI) / 12) )
+        }
+    }
+    // up-down angle, chi = pi/2 is in z direction
     
     var distance : Float = 1.0
     

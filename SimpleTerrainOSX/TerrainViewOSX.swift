@@ -9,8 +9,13 @@
 import Cocoa
 import CoreGraphics
 
+// TODO: add support for all the missing camera controls from the IOS version
+
 class TerrainViewOSX : NSOpenGLView
 {
+    var displayLink : CVDisplayLink?
+    var lasttime : Double = 0
+    
     override var acceptsFirstResponder: Bool { return true }
     
     let renderer = TerrainRenderer()
@@ -20,9 +25,68 @@ class TerrainViewOSX : NSOpenGLView
     var mousePosition : CGPoint = CGPointMake(0, 0)
     var mouseDown = false
     
+    let camMotion = CameraMotion()
+    
+    override func prepareOpenGL() {
+        var swapInt : GLint = 1
+        self.openGLContext?.setValues(&swapInt, forParameter: NSOpenGLContextParameter.GLCPSwapInterval)
+        
+        // copied some code from https://forums.developer.apple.com/thread/23142
+        
+        //  The callback function is called everytime CVDisplayLink says its time to get a new frame.
+        func displayLinkOutputCallback(displayLink: CVDisplayLink, _ inNow: UnsafePointer<CVTimeStamp>, _ inOutputTime: UnsafePointer<CVTimeStamp>, _ flagsIn: CVOptionFlags, _ flagsOut: UnsafeMutablePointer<CVOptionFlags>, _ displayLinkContext: UnsafeMutablePointer<Void>) -> CVReturn {
+            
+            /*  The displayLinkContext is CVDisplayLink's parameter definition of the view in which we are working.
+             In order to access the methods of a given view we need to specify what kind of view it is as right
+             now the UnsafeMutablePointer<Void> just means we have a pointer to "something".  To cast the pointer
+             such that the compiler at runtime can access the methods associated with our SwiftOpenGLView, we use
+             an unsafeBitCast.  The definition of which states, "Returns the the bits of x, interpreted as having
+             type U."  We may then call any of that view's methods.  Here we call drawView() which we draw a
+             frame for rendering.  */
+            unsafeBitCast(displayLinkContext, TerrainViewOSX.self).updateFrame()
+            
+            //  We are going to assume that everything went well for this mock up, and pass success as the CVReturn
+            return kCVReturnSuccess
+        }
+        
+        //  Grab the a link to the active displays, set the callback defined above, and start the link.
+        /*  An alternative to a nested function is a global function or a closure passed as the argument--a local function
+         (i.e. a function defined within the class) is NOT allowed. */
+        //  The UnsafeMutablePointer<Void>(unsafeAddressOf(self)) passes a pointer to the instance of our class.
+        CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
+        CVDisplayLinkSetOutputCallback(displayLink!, displayLinkOutputCallback, UnsafeMutablePointer<Void>(unsafeAddressOf(self)))
+        CVDisplayLinkStart(displayLink!)
+        CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
+        
+    }
     override func drawRect(dirtyRect: NSRect) {
         renderer.render(width: self.frame.width, height: self.frame.height)
         glFlush()
+    }
+    
+    func updateFrame()
+    {
+//        Swift.print("update frame")
+        // now, let's get a reliable time stamp, according to http://blog.airsource.co.uk/2010/03/15/quelle-heure-est-il/ this can be a little messy, see also https://forums.developer.apple.com/thread/12135
+        
+        // since we don't care about the user changing the system time mid-game, let's trust CFAbsoluteTimeGetCurrent()
+        
+        let now = CFAbsoluteTimeGetCurrent()
+        if(lasttime == 0)
+        {
+            lasttime = now
+            return
+        }
+        else
+        {
+            let dt = Float(now - lasttime)
+            lasttime = now
+            if(camMotion.isMoving)
+            {
+                camMotion.move(dt: dt, speed: 50, cam: renderer.cam!)
+                self.needsDisplay = true
+            }
+        }
     }
     
     func recreateTerrain()
@@ -86,21 +150,44 @@ class TerrainViewOSX : NSOpenGLView
     
     override func keyDown(theEvent: NSEvent) {
         // Swift.print("key down")
-        self.interpretKeyEvents([theEvent])
+        let s = theEvent.charactersIgnoringModifiers
+        switch(s!)
+        {
+        case "w": camMotion.forward = true // renderer.cam?.forwardBackwardPlanar(d)
+        case "s": camMotion.backward = true // renderer.cam?.forwardBackwardPlanar(-d)
+        case "a": camMotion.left = true // renderer.cam?.leftRight(-d)
+        case "d": camMotion.right = true // renderer.cam?.leftRight(d)
+        case " ": camMotion.up = true // renderer.cam?.lowerHigher(d)
+        case "c": camMotion.down = true // renderer.cam?.lowerHigher(-d)
+        default:
+            self.interpretKeyEvents([theEvent])
+        }
+    }
+    
+    override func keyUp(theEvent: NSEvent)
+    {
+        let s = theEvent.charactersIgnoringModifiers
+        switch(s!)
+        {
+        case "w": camMotion.forward = false
+        case "s": camMotion.backward = false
+        case "a": camMotion.left = false
+        case "d": camMotion.right = false
+        case " ": camMotion.up = false
+        case "c": camMotion.down = false
+        default:
+            break // do nothing
+            // self.interpretKeyEvents([theEvent])
+        }
+
     }
     
     override func insertText(insertString: AnyObject) {
         let s = insertString as! String
-        let d : Float = 1.0
+
         switch(s)
         {
-        case "w": renderer.cam?.forwardBackwardPlanar(d)
-        case "s": renderer.cam?.forwardBackwardPlanar(-d)
-        case "a": renderer.cam?.leftRight(-d)
-        case "d": renderer.cam?.leftRight(d)
-        case " ": renderer.cam?.lowerHigher(d)
-        case "c": renderer.cam?.lowerHigher(-d)
-            
+        case ".": camMotion.stop()
         case "t": renderer.triangulationType = (renderer.triangulationType + 1) % 3
         case "r": renderer.isWireframe = !renderer.isWireframe
         case "f": renderer.isCameraLight = !renderer.isCameraLight
@@ -130,8 +217,5 @@ class TerrainViewOSX : NSOpenGLView
             break
         }
         self.needsDisplay = true
-    }
-    override func keyUp(theEvent: NSEvent) {
-        // Swift.print("key up")
     }
 }
