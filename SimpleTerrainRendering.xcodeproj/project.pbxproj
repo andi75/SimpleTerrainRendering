@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E11B23A81D3999CE00C9D905 /* TriangleAdjacency.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11B23A71D3999CE00C9D905 /* TriangleAdjacency.swift */; };
 		E1444B1F1D3276D5004F5C05 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1444B1E1D3276D5004F5C05 /* AppDelegate.swift */; };
 		E1444B211D3276D5004F5C05 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1444B201D3276D5004F5C05 /* ViewController.swift */; };
 		E1444B231D3276D5004F5C05 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1444B221D3276D5004F5C05 /* Assets.xcassets */; };
@@ -18,6 +19,7 @@
 		E16B63221D368409009EA105 /* QuadTreeTerrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = E16B63211D368409009EA105 /* QuadTreeTerrain.swift */; };
 		E17CF8F81D38F1E700BF4E19 /* CameraMotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E17CF8F71D38F1E700BF4E19 /* CameraMotion.swift */; };
 		E17CF8F91D38F2E800BF4E19 /* CameraMotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E17CF8F71D38F1E700BF4E19 /* CameraMotion.swift */; };
+		E18F52641D3AE95600371E89 /* TriangleAdjacency.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11B23A71D3999CE00C9D905 /* TriangleAdjacency.swift */; };
 		E1B747C31D352130008C0F74 /* TerrainData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DD22321C26BE740082EA63 /* TerrainData.swift */; };
 		E1B747C41D352133008C0F74 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E149FAA21CA99C4600B73248 /* Geometry.swift */; };
 		E1B747C51D352136008C0F74 /* TerrainCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = E166887B1C2967E400B7C336 /* TerrainCamera.swift */; };
@@ -35,6 +37,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E11B23A71D3999CE00C9D905 /* TriangleAdjacency.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TriangleAdjacency.swift; sourceTree = "<group>"; };
 		E1444B1C1D3276D5004F5C05 /* SimpleTerrainOSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimpleTerrainOSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1444B1E1D3276D5004F5C05 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E1444B201D3276D5004F5C05 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -133,6 +136,7 @@
 				E1F7BF311D352C3900C6622B /* TerrainRenderer.swift */,
 				E16864A71D383B69003BF0A6 /* TerrainFactory.swift */,
 				E17CF8F71D38F1E700BF4E19 /* CameraMotion.swift */,
+				E11B23A71D3999CE00C9D905 /* TriangleAdjacency.swift */,
 			);
 			path = SimpleTerrainRendering;
 			sourceTree = "<group>";
@@ -239,6 +243,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E1F0AE171D368DEA00B1EFF6 /* QuadTreeTerrain.swift in Sources */,
+				E18F52641D3AE95600371E89 /* TriangleAdjacency.swift in Sources */,
 				E16864A91D383B69003BF0A6 /* TerrainFactory.swift in Sources */,
 				E1444B211D3276D5004F5C05 /* ViewController.swift in Sources */,
 				E1B747C41D352133008C0F74 /* Geometry.swift in Sources */,
@@ -256,6 +261,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E16B63221D368409009EA105 /* QuadTreeTerrain.swift in Sources */,
+				E11B23A81D3999CE00C9D905 /* TriangleAdjacency.swift in Sources */,
 				E16864A81D383B69003BF0A6 /* TerrainFactory.swift in Sources */,
 				F730AB021C26E0DF0035F2E9 /* SimpleTerrainView.swift in Sources */,
 				E1F7BF321D352C3900C6622B /* TerrainRenderer.swift in Sources */,
