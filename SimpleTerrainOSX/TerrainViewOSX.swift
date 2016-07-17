@@ -212,6 +212,9 @@ class TerrainViewOSX : NSOpenGLView
             renderer.zScale *= 1.0 / 1.1
         case "n":
             renderer.showDebugNormals = !renderer.showDebugNormals
+        case "m":
+            renderer.showDebugShadowGeometry = !renderer.showDebugShadowGeometry
+
         default:
             Swift.print("unrecognized input: \(s)")
             break

@@ -66,7 +66,7 @@ class TerrainRenderer
     }
     
     var showDebugNormals = false
-    var showDebugShadowGeometry = true
+    var showDebugShadowGeometry = false
     
     var isValidGeometry = false
     var isValidIndices = false
@@ -82,12 +82,25 @@ class TerrainRenderer
         isValidIndices = false
     }
     
+    func checkGLError( message : String )
+    {
+        let error = glGetError()
+        if(error != 0)
+        {
+            print("\(message): \(error)")
+        }
+    }
+    
     func render(width width : CGFloat, height : CGFloat) {
 //        print("render() called")
+        checkGLError("before frame")
+        
+        let global_ambient : [Float] = [ 0, 0, 0, 1 ]
+        glLightModelfv(GLenum(GL_LIGHT_MODEL_AMBIENT), global_ambient)
         
         glClearColor(0.3, 0.3, 0.8, 0.0)
 //        glClearColor(1.0, 1.0, 1.0, 0.0)
-        glClear( GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  )
+        glClear( GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)  )
         
         glEnable( GLenum(GL_DEPTH_TEST) )
         glViewport(0, 0, GLsizei(width), GLsizei(height))
@@ -100,6 +113,7 @@ class TerrainRenderer
         {
             print("missing camera or terrain")
         }
+        checkGLError("after frame")
     }
     
     func glMatrix(mat : GLKMatrix4) -> [Float]
@@ -196,8 +210,6 @@ class TerrainRenderer
             
             print("edgeVertexCount: \(self.edgeVertices!.count / 3)")
         }
-
-
     }
     
     class func terrainColor(t : Float) -> [Float]
@@ -258,10 +270,6 @@ class TerrainRenderer
                 {
                     colors[4 * vertex + i] = color[i]
                 }
-//                colors[4 * vertex + 0] = Float(x) / Float(terrain.width) // base + (1 - base) * terrainValue
-//                colors[4 * vertex + 1] = Float(y) / Float(terrain.height) // base + (1 - base) * terrainValue
-//                colors[4 * vertex + 2] = 1
-//                colors[4 * vertex + 3] = 1 // alpha
             }
         }
         return colors
@@ -402,7 +410,8 @@ class TerrainRenderer
                 
                 normals[3 * vertex + 0] = vNormal.x
                 normals[3 * vertex + 1] = vNormal.y
-                normals[3 * vertex + 2] = vNormal.z            }
+                normals[3 * vertex + 2] = vNormal.z
+            }
         }
         return normals
     }
@@ -543,16 +552,7 @@ class TerrainRenderer
         }
     }
     
-    /**
-     Renders terrain geometry either as triangles or as wireframe.
-     Relies on createVertexGeometry(), createVertexColors(),
-     createNormalGeometry(), and either createTriangleIndices() or
-     createWireframeIndices() being called before
-     
-     Optionally draws normals for debugging (relies on createDebugNormalGeometry()
-     being called before
-     */
-    func renderTerrainGeometry()
+    func pushTerrainVertices()
     {
         glVertexPointer(3, GLenum(GL_FLOAT), 0, self.vertices!)
         glColorPointer(4, GLenum(GL_FLOAT), 0, self.colors!)
@@ -560,26 +560,6 @@ class TerrainRenderer
         glEnableClientState(GLenum(GL_VERTEX_ARRAY))
         glEnableClientState(GLenum(GL_COLOR_ARRAY))
         glEnableClientState(GLenum(GL_NORMAL_ARRAY))
-        
-        let light0diffuse : [Float] = [ 1, 1, 1, 1 ]
-        let light0ambient : [Float] = [ 0, 0, 0, 1 ]
-        let light0specular : [Float] = [ 0, 0, 0, 1 ]
-        
-        glEnable( GLenum(GL_LIGHT0) )
-        glEnable( GLenum(GL_LIGHTING) )
-        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_DIFFUSE), light0diffuse)
-        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_AMBIENT), light0ambient)
-        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_SPECULAR), light0specular)
-        
-        glEnable( GLenum(GL_RESCALE_NORMAL ) )
-        
-        glCullFace( GLenum(GL_BACK) )
-        glEnable( GLenum(GL_CULL_FACE) )
-        
-        // default behaviour in OpenGL ES
-        // glColorMaterial( GLenum(GL_FRONT), GLenum(GL_AMBIENT_AND_DIFFUSE) )
-        glEnable( GLenum(GL_COLOR_MATERIAL) )
-        
         
         if(self.isWireframe)
         {
@@ -592,6 +572,105 @@ class TerrainRenderer
         glDisableClientState(GLenum(GL_NORMAL_ARRAY))
         glDisableClientState(GLenum(GL_COLOR_ARRAY))
         glDisableClientState(GLenum(GL_VERTEX_ARRAY))
+
+    }
+    
+    func setupAmbientLightParameters()
+    {
+        let light0diffuse : [Float] = [ 0, 0, 0, 1 ]
+        let light0ambient : [Float] = [ 0.0, 0.0, 0.0, 1 ]
+        let light0specular : [Float] = [ 0, 0, 0, 1 ]
+        
+        glEnable( GLenum(GL_LIGHT0) )
+        glEnable( GLenum(GL_LIGHTING) )
+        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_DIFFUSE), light0diffuse)
+        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_AMBIENT), light0ambient)
+        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_SPECULAR), light0specular)
+        
+        // default behaviour in OpenGL ES
+        // glColorMaterial( GLenum(GL_FRONT), GLenum(GL_AMBIENT_AND_DIFFUSE) )
+        glEnable( GLenum(GL_COLOR_MATERIAL) )
+        // glEnable( GLenum(GL_RESCALE_NORMAL ) )
+    }
+    
+    func setupDiffuseLightParameters()
+    {
+        let light0diffuse : [Float] = [ 1, 1, 1, 1 ]
+        let light0ambient : [Float] = [ 0, 0, 0, 1 ]
+        let light0specular : [Float] = [ 0, 0, 0, 1 ]
+        
+        glEnable( GLenum(GL_LIGHT0) )
+        glEnable( GLenum(GL_LIGHTING) )
+        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_DIFFUSE), light0diffuse)
+        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_AMBIENT), light0ambient)
+        glLightfv( GLenum(GL_LIGHT0), GLenum(GL_SPECULAR), light0specular)
+        
+        // default behaviour in OpenGL ES
+        // glColorMaterial( GLenum(GL_FRONT), GLenum(GL_AMBIENT_AND_DIFFUSE) )
+        glEnable( GLenum(GL_COLOR_MATERIAL) )
+        // glEnable( GLenum(GL_RESCALE_NORMAL ) )
+    }
+
+    func pushShadowVolumeGeometry()
+    {
+        glVertexPointer(3, GLenum(GL_FLOAT), 0, self.edgeVertices!)
+        glEnableClientState(GLenum(GL_VERTEX_ARRAY))
+        glDrawArrays(GLenum(GL_QUADS), 0, GLsizei(self.edgeVertices!.count / 3))
+        glDisableClientState(GLenum(GL_VERTEX_ARRAY))
+    }
+    
+    /**
+     Renders terrain geometry either as triangles or as wireframe.
+     Relies on createVertexGeometry(), createVertexColors(),
+     createNormalGeometry(), and either createTriangleIndices() or
+     createWireframeIndices() being called before
+     
+     Optionally draws normals for debugging (relies on createDebugNormalGeometry()
+     being called before)
+     */
+    func renderTerrainGeometry()
+    {
+        setupAmbientLightParameters()
+        
+        glDisable(GLenum(GL_BLEND))
+        
+        glCullFace( GLenum(GL_BACK) )
+        glEnable( GLenum(GL_CULL_FACE) )
+        pushTerrainVertices()
+        
+        glDepthMask( GLboolean(GL_FALSE) )
+        glColorMask( GLboolean(GL_FALSE), GLboolean(GL_FALSE), GLboolean(GL_FALSE), GLboolean(GL_FALSE) )
+
+        // setting depth func is not really necessary
+        glDepthFunc(GLenum(GL_LEQUAL))
+
+        // increase the stencil buffer for everything (guess this should only be for
+        // front faces of volumes, but currently we don't have any true back faces yet)
+        glEnable(GLenum(GL_STENCIL_TEST))
+        glStencilFunc( GLenum(GL_ALWAYS), 0, 127)
+        glStencilOp( GLenum(GL_KEEP), GLenum(GL_KEEP), GLenum(GL_INCR) )
+        glDisable(GLenum(GL_CULL_FACE))
+        pushShadowVolumeGeometry()
+        glEnable(GLenum(GL_CULL_FACE))
+        
+        glDepthMask( GLboolean(GL_TRUE) )
+        glColorMask( GLboolean(GL_TRUE), GLboolean(GL_TRUE), GLboolean(GL_TRUE), GLboolean(GL_TRUE) )
+        
+        glStencilOp( GLenum(GL_KEEP), GLenum(GL_KEEP), GLenum(GL_KEEP) )
+        glStencilFunc( GLenum(GL_EQUAL), 0, 127 )
+        
+        setupDiffuseLightParameters()
+        
+        glDepthFunc(GLenum(GL_LEQUAL))
+        glEnable(GLenum(GL_BLEND))
+        glBlendFunc(GLenum(GL_ONE), GLenum(GL_ONE))
+        
+        glCullFace( GLenum(GL_BACK) )
+        glEnable( GLenum(GL_CULL_FACE) )
+        
+        glEnable( GLenum(GL_STENCIL_TEST) )
+        pushTerrainVertices()
+        glDisable( GLenum(GL_STENCIL_TEST) )
         
         glDisable( GLenum(GL_LIGHT0) )
         glDisable( GLenum(GL_LIGHTING) )
@@ -613,14 +692,45 @@ class TerrainRenderer
             glDisable(GLenum(GL_CULL_FACE))
             glDisable(GLenum(GL_DEPTH_TEST))
             glColor4f(1, 1, 1, 1)
-            glVertexPointer(3, GLenum(GL_FLOAT), 0, self.edgeVertices!)
-            glEnableClientState(GLenum(GL_VERTEX_ARRAY))
-            glDrawArrays(GLenum(GL_QUADS), 0, GLsizei(self.edgeVertices!.count / 3))
-            glDisableClientState(GLenum(GL_VERTEX_ARRAY))
+            pushShadowVolumeGeometry()
             glEnable(GLenum(GL_DEPTH_TEST))
             glEnable(GLenum(GL_CULL_FACE))
             glPolygonMode(GLenum(GL_FRONT_AND_BACK), GLenum(GL_FILL))
         }
+        
+        // full screen quad
+
+//        glDisable(GLenum(GL_DEPTH_TEST))
+//        glDisable(GLenum(GL_BLEND))
+//        
+//        glColor4f(1, 0, 0, 1)
+//        
+//        glEnable(GLenum(GL_STENCIL_TEST))
+//        glStencilFunc( GLenum(GL_ALWAYS), 0, 127)
+//        glStencilOp( GLenum(GL_KEEP), GLenum(GL_KEEP), GLenum(GL_INCR) )
+//        drawFullScreenQuad(0.7)
+//        
+//        glColor4f(0, 1, 0, 1)
+//        glStencilFunc( GLenum(GL_EQUAL), 0, 127 )
+//        glEnable(GLenum(GL_STENCIL_TEST))
+//        drawFullScreenQuad(0.9)
+//        glDisable(GLenum(GL_STENCIL_TEST))
+//
+//        glEnable(GLenum(GL_DEPTH_TEST))
+    }
+    
+    func drawFullScreenQuad(size: Float)
+    {
+        glMatrixMode(GLenum(GL_PROJECTION))
+        glLoadIdentity()
+        glMatrixMode(GLenum(GL_MODELVIEW))
+        glLoadIdentity()
+        glScalef(size, size, size)
+        let quad : [Float] = [ -1, -1, 1, -1, 1, 1, -1, 1 ]
+        glVertexPointer(2, GLenum(GL_FLOAT), 0, quad)
+        glEnableClientState(GLenum(GL_VERTEX_ARRAY))
+        glDrawArrays(GLenum(GL_QUADS), 0, 4)
+        glDisableClientState(GLenum(GL_VERTEX_ARRAY))
     }
     
     
