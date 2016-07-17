@@ -12,17 +12,15 @@ import GLKit
 class ShadowVolume
 {
     var vertices : [Float]
-    var indices : [Int]
+    var indices : [UInt32]
     var adjacency : [Int]
     var faceNormals : [Float]
     
-    var lightDirection : GLKVector3 = GLKVector3Make(0, 0, 0)
-    
     var silouette : [Int]?
-    var frontFaces : [Int]?
-    var backFaces : [Int]?
+    var frontFaces : [UInt32]?
+    var backFaces : [UInt32]?
     
-    init(vertices : [Float], indices : [Int], adjacency : [Int], faceNormals : [Float])
+    init(vertices : [Float], indices : [UInt32], adjacency : [Int], faceNormals : [Float])
     {
         self.vertices = vertices
         self.indices = indices
@@ -33,13 +31,13 @@ class ShadowVolume
         assert(adjacency.count == indices.count)
     }
     
-    func computeSilouette()
+    func computeSilouette(lightDirection : GLKVector3)
     {
         // TODO: untested and unused
         assert(
-            self.lightDirection.x != 0 ||
-            self.lightDirection.y != 0 ||
-            self.lightDirection.z != 0
+            lightDirection.x != 0 ||
+            lightDirection.y != 0 ||
+            lightDirection.z != 0
         )
         
         let triangles = indices.count / 3
@@ -94,21 +92,22 @@ class ShadowVolume
                 if( neighbor != -1 && i < neighbor && dotSigns[i] != dotSigns[ neighbor ])
                 {
                     // silouette edge found
-                    currentEdge += 1
                     
                     // TODO: in the original C code in Nebu, I'm switching the vertex order
                     // depending on the dotSign of triangle i. I'm not sure why. Figure out
                     // if that's important!
-                    silouette![ currentEdge * 2 + 0] = indices[ 3 * i + j ]
-                    silouette![ currentEdge * 2 + 1] = indices[ 3 * i + ( (j + 1) % 3 ) ]
+                    silouette![ currentEdge * 2 + 0] = Int(indices[ 3 * i + j ])
+                    silouette![ currentEdge * 2 + 1] = Int(indices[ 3 * i + ( (j + 1) % 3 ) ])
+
+                    currentEdge += 1
                 }
             }
         }
         
         var currentFrontFace = 0
         var currentBackFace = 0
-        self.frontFaces = [Int](count: frontFaceCount * 3, repeatedValue: 0)
-        self.backFaces = [Int](count: backFaceCount * 3, repeatedValue : 0)
+        self.frontFaces = [UInt32](count: frontFaceCount * 3, repeatedValue: 0)
+        self.backFaces = [UInt32](count: backFaceCount * 3, repeatedValue : 0)
 
         for i in 0..<triangles
         {

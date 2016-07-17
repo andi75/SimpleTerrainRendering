@@ -19,7 +19,7 @@ class TerrainViewOSX : NSOpenGLView
     override var acceptsFirstResponder: Bool { return true }
     
     let renderer = TerrainRenderer()
-    let qt = QuadTreeTerrain(maxLevel: 8)
+    let qt = QuadTreeTerrain(maxLevel: 7)
     var qtDisplayLevel : Int = 0
     
     var mousePosition : CGPoint = CGPointMake(0, 0)

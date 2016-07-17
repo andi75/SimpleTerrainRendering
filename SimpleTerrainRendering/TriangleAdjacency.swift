@@ -18,7 +18,7 @@ class TriangleAdjancency
      Computes for each triangle in the indices array the index of the three adjancent triangles,
      or -1 if there's no adjacent triang le
      */
-    init(indices : [Int], vertexCount : Int)
+    init(indices : [UInt32], vertexCount : Int)
     {
         let triangleCount = indices.count / 3
         adjacency = [Int](count: triangleCount * 3, repeatedValue: -1)
@@ -29,7 +29,7 @@ class TriangleAdjancency
         {
             for j in 0..<3
             {
-                vertexOrder[ indices[3 * i + j] ] += 1
+                vertexOrder[ Int(indices[3 * i + j]) ] += 1
             }
         }
         // foreach vertex, store the list of triangles it is part of
@@ -52,7 +52,7 @@ class TriangleAdjancency
         {
             for j in 0..<3
             {
-                let vertex = indices[3 * i + j]
+                let vertex = Int(indices[3 * i + j])
                 let offset = vertexTriangleListOffset[vertex] + tmpTriangleOffset[vertex]
                 vertexTriangleList[offset] = i
                 tmpTriangleOffset[vertex] += 1
@@ -69,8 +69,8 @@ class TriangleAdjancency
             for j in 0..<3
             {
                 // v1-v2 form an edge of the triangle
-                let v1 = indices[3 * i + j]
-                let v2 = indices[3 * i + ( (j + 1) % 3)]
+                let v1 = Int( indices[3 * i + j] )
+                let v2 = Int( indices[3 * i + ( (j + 1) % 3)] )
 
                 let baseOffsetV1 = vertexTriangleListOffset[v1]
                 
@@ -85,8 +85,8 @@ class TriangleAdjancency
                     let triangle = vertexTriangleList[ baseOffsetV1 + k]
                     for l in 0..<3
                     {
-                        if( indices[3 * triangle + ((l + 1) % 3)] == v1 &&
-                            indices[3 * triangle + l] == v2 )
+                        if( Int(indices[3 * triangle + ((l + 1) % 3)]) == v1 &&
+                            Int(indices[3 * triangle + l]) == v2 )
                         {
                             // adjacency found
                             assert(

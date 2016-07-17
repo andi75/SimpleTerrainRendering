@@ -29,6 +29,9 @@ class TerrainRenderer
     var colors : [Float]?
     var indices : [UInt32]?
     var normalVertices : [Float]?
+    
+    var edgeVertices : [Float]?
+    
     var vertexCount : Int = 0
     var normalVertexcount : Int = 0
     var primitiveCount : Int = 0
@@ -63,6 +66,7 @@ class TerrainRenderer
     }
     
     var showDebugNormals = false
+    var showDebugShadowGeometry = true
     
     var isValidGeometry = false
     var isValidIndices = false
@@ -154,7 +158,9 @@ class TerrainRenderer
 
     func createGeometry()
     {
-        if(!isValidGeometry)
+        var updateShadowGeometry = false
+        
+        if(!self.isValidGeometry)
         {
             self.vertices = TerrainRenderer.createVertexGeometry(self.data!, xyScale: xyScale, zScale: zScale)
             self.vertexCount = self.vertices!.count / 3
@@ -164,9 +170,10 @@ class TerrainRenderer
             
             createDebugNormalGeometry()
             
-            isValidGeometry = true
+            self.isValidGeometry = true
+            updateShadowGeometry = true
         }
-        if(!isValidIndices)
+        if(!self.isValidIndices)
         {
             if(self.isWireframe)
             {
@@ -178,7 +185,16 @@ class TerrainRenderer
                 self.indices = TerrainRenderer.createTriangleIndices(self.data!, triangulationType: self.triangulationType)
                 self.primitiveCount = self.indices!.count / 3
             }
-            isValidIndices = true
+            self.isValidIndices = true
+        }
+        
+        if(updateShadowGeometry && !self.isWireframe)
+        {
+            let faceNormals = TerrainRenderer.createFaceNormals(self.vertices!, indices: self.indices!)
+            let adjacency = TriangleAdjancency(indices: self.indices!, vertexCount: self.vertexCount).adjacency
+            self.edgeVertices = TerrainRenderer.createShadowGeometry(self.vertices!, indices: self.indices!, faceNormals: faceNormals, adjacency: adjacency, lightDirection: GLKVector3Make(1, 1, -1))
+            
+            print("edgeVertexCount: \(self.edgeVertices!.count / 3)")
         }
 
 
@@ -251,9 +267,8 @@ class TerrainRenderer
         return colors
     }
 
-    class func createFaceNormals(vertices: [Float], indices: [Int32]) -> [Float]
+    class func createFaceNormals(vertices: [Float], indices: [UInt32]) -> [Float]
     {
-        // TODO: This function is not used yet
         let nFaces : Int = indices.count / 3
         
         var faceNormals : [Float] = [Float](count: 3 * nFaces, repeatedValue: 0)
@@ -284,9 +299,60 @@ class TerrainRenderer
         return faceNormals
     }
     
-    func createShadowGeometry(vertices: [Float], indices: [Int32], faceNormals: [Float], lightDirection: GLKVector3)
+    class func createShadowGeometry(vertices: [Float], indices: [UInt32], faceNormals: [Float], adjacency: [Int], lightDirection: GLKVector3) -> [Float]
     {
-        // TODO: totally unfinished
+        let shadowVolume = ShadowVolume(vertices: vertices, indices: indices, adjacency: adjacency, faceNormals: faceNormals)
+        shadowVolume.computeSilouette(lightDirection)
+        
+        let edgeVertexCount = 2 * shadowVolume.silouette!.count
+        let edgeQuads = shadowVolume.silouette!.count / 2
+        var edgeVertices = [Float](count: edgeVertexCount * 3, repeatedValue: 0)
+        
+        let lightDirNormalized = GLKVector3Normalize(lightDirection)
+        
+        for i in 0..<edgeQuads
+        {
+            let v1Index = shadowVolume.silouette![2 * i + 0]
+            let v2Index = shadowVolume.silouette![2 * i + 1]
+            
+            let v1 = GLKVector3Make(
+                vertices[3 * v1Index + 0],
+                vertices[3 * v1Index + 1],
+                vertices[3 * v1Index + 2]
+                )
+            let v2 = GLKVector3Make(
+                vertices[3 * v2Index + 0],
+                vertices[3 * v2Index + 1],
+                vertices[3 * v2Index + 2]
+            )
+            // TODO: check if light is parallel to the ground
+            let t1 = -v1.z / lightDirNormalized.z
+            let t2 = -v2.z / lightDirNormalized.z
+            let v1Extrusion = GLKVector3MultiplyScalar(lightDirNormalized, t1)
+            let v2Extrusion = GLKVector3MultiplyScalar(lightDirNormalized, t2)
+            let v1Extracted = GLKVector3Add(v1, v1Extrusion)
+            let v2Extracted = GLKVector3Add(v2, v2Extrusion)
+            
+            // print("\(GLKV3toString(v1)) -> \(GLKV3toString(v1Extracted))")
+            // print("\(GLKV3toString(v2)) -> \(GLKV3toString(v2Extracted))")
+            
+            edgeVertices[4 * 3 * i + 0] = v1.x
+            edgeVertices[4 * 3 * i + 1] = v1.y
+            edgeVertices[4 * 3 * i + 2] = v1.z
+
+            edgeVertices[4 * 3 * i + 3] = v2.x
+            edgeVertices[4 * 3 * i + 4] = v2.y
+            edgeVertices[4 * 3 * i + 5] = v2.z
+            
+            edgeVertices[4 * 3 * i + 6] = v2Extracted.x
+            edgeVertices[4 * 3 * i + 7] = v2Extracted.y
+            edgeVertices[4 * 3 * i + 8] = v2Extracted.z
+
+            edgeVertices[4 * 3 * i + 9] = v1Extracted.x
+            edgeVertices[4 * 3 * i + 10] = v1Extracted.y
+            edgeVertices[4 * 3 * i + 11] = v1Extracted.z
+        }
+        return edgeVertices
     }
     
     class func createVertexGeometry(terrain: TerrainData, xyScale : Float, zScale : Float) -> [Float]
@@ -391,7 +457,6 @@ class TerrainRenderer
                     }
                     primitive += 1
                 }
-                // TODO: Create adjacency
             }
         }
         return indices
@@ -444,7 +509,8 @@ class TerrainRenderer
                 }
                 triangle += 2
                 
-                // TODO: Create adjacency
+                // TODO: Create adjacency directly (faster then then the
+                // general adjacency computiation)
             }
         }
         return indices
@@ -539,6 +605,21 @@ class TerrainRenderer
             glDrawArrays(GLenum(GL_LINES), 0, GLsizei(self.normalVertexcount))
             glDisableClientState(GLenum(GL_COLOR_ARRAY))
             glDisableClientState(GLenum(GL_VERTEX_ARRAY))
+        }
+        
+        if(self.showDebugShadowGeometry)
+        {
+            glPolygonMode(GLenum(GL_FRONT_AND_BACK), GLenum(GL_LINE))
+            glDisable(GLenum(GL_CULL_FACE))
+            glDisable(GLenum(GL_DEPTH_TEST))
+            glColor4f(1, 1, 1, 1)
+            glVertexPointer(3, GLenum(GL_FLOAT), 0, self.edgeVertices!)
+            glEnableClientState(GLenum(GL_VERTEX_ARRAY))
+            glDrawArrays(GLenum(GL_QUADS), 0, GLsizei(self.edgeVertices!.count / 3))
+            glDisableClientState(GLenum(GL_VERTEX_ARRAY))
+            glEnable(GLenum(GL_DEPTH_TEST))
+            glEnable(GLenum(GL_CULL_FACE))
+            glPolygonMode(GLenum(GL_FRONT_AND_BACK), GLenum(GL_FILL))
         }
     }
     
