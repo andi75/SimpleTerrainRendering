@@ -93,12 +93,19 @@ class ShadowVolume
                 {
                     // silouette edge found
                     
-                    // TODO: in the original C code in Nebu, I'm switching the vertex order
-                    // depending on the dotSign of triangle i. I'm not sure why. Figure out
-                    // if that's important!
-                    silouette![ currentEdge * 2 + 0] = Int(indices[ 3 * i + j ])
-                    silouette![ currentEdge * 2 + 1] = Int(indices[ 3 * i + ( (j + 1) % 3 ) ])
-
+                    // if triangle i is backfacing, we need to switch the edge direction
+                    // in the silouette order to get the correct front facing and back
+                    // facing shadow volumes
+                    if( dotSigns[i] == -1)
+                    {
+                        silouette![ currentEdge * 2 + 0] = Int(indices[ 3 * i + j ])
+                        silouette![ currentEdge * 2 + 1] = Int(indices[ 3 * i + ( (j + 1) % 3 ) ])
+                    }
+                    else
+                    {
+                        silouette![ currentEdge * 2 + 0] = Int(indices[ 3 * i + ( (j + 1) % 3 ) ])
+                        silouette![ currentEdge * 2 + 1] = Int(indices[ 3 * i + j ])
+                    }
                     currentEdge += 1
                 }
             }

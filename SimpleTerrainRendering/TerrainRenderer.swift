@@ -36,6 +36,9 @@ class TerrainRenderer
     var normalVertexcount : Int = 0
     var primitiveCount : Int = 0
     
+    var lightDir = GLKVector3Make(1, 1, -0.6)
+    var lightPos : [Float] = [ -1, -1, 0.6, 0 ]
+    
     var xyScale : Float = 1.0 {
         didSet {
             isValidGeometry = false
@@ -71,7 +74,7 @@ class TerrainRenderer
     var isValidGeometry = false
     var isValidIndices = false
     
-    var isCameraLight = true
+    var isCameraLight = false
     
     var cam : TerrainCamera? = nil
     
@@ -145,16 +148,14 @@ class TerrainRenderer
         )
         glLoadIdentity()
         
-        let lightpos : [Float] = [ 0, 0, 1, 0 ]
-        
         if(isCameraLight)
         {
-            glLightfv( GLenum(GL_LIGHT0), GLenum(GL_POSITION), lightpos)
+            glLightfv( GLenum(GL_LIGHT0), GLenum(GL_POSITION), self.lightPos)
         }
         glLoadMatrixf(glMatrix(camMatrix))
         if(!isCameraLight)
         {
-            glLightfv( GLenum(GL_LIGHT0), GLenum(GL_POSITION), lightpos)
+            glLightfv( GLenum(GL_LIGHT0), GLenum(GL_POSITION), self.lightPos)
         }
         
         // TODO: call this function only when the geometry has changed
@@ -206,7 +207,7 @@ class TerrainRenderer
         {
             let faceNormals = TerrainRenderer.createFaceNormals(self.vertices!, indices: self.indices!)
             let adjacency = TriangleAdjancency(indices: self.indices!, vertexCount: self.vertexCount).adjacency
-            self.edgeVertices = TerrainRenderer.createShadowGeometry(self.vertices!, indices: self.indices!, faceNormals: faceNormals, adjacency: adjacency, lightDirection: GLKVector3Make(1, 1, -1))
+            self.edgeVertices = TerrainRenderer.createShadowGeometry(self.vertices!, indices: self.indices!, faceNormals: faceNormals, adjacency: adjacency, lightDirection: self.lightDir)
             
             print("edgeVertexCount: \(self.edgeVertices!.count / 3)")
         }
@@ -316,8 +317,11 @@ class TerrainRenderer
         let edgeQuads = shadowVolume.silouette!.count / 2
         var edgeVertices = [Float](count: edgeVertexCount * 3, repeatedValue: 0)
         
+
         let lightDirNormalized = GLKVector3Normalize(lightDirection)
-        
+//        let v = GLKVector3Normalize(lightDirection)
+//        let lightDirHack = GLKVector3Make(v.x, v.y, v.z * 1.4)
+//        let lightDirNormalized = GLKVector3Normalize(lightDirHack)
         for i in 0..<edgeQuads
         {
             let v1Index = shadowVolume.silouette![2 * i + 0]
@@ -348,17 +352,17 @@ class TerrainRenderer
             edgeVertices[4 * 3 * i + 1] = v1.y
             edgeVertices[4 * 3 * i + 2] = v1.z
 
-            edgeVertices[4 * 3 * i + 3] = v2.x
-            edgeVertices[4 * 3 * i + 4] = v2.y
-            edgeVertices[4 * 3 * i + 5] = v2.z
+            edgeVertices[4 * 3 * i + 3] = v1Extracted.x
+            edgeVertices[4 * 3 * i + 4] = v1Extracted.y
+            edgeVertices[4 * 3 * i + 5] = v1Extracted.z
             
             edgeVertices[4 * 3 * i + 6] = v2Extracted.x
             edgeVertices[4 * 3 * i + 7] = v2Extracted.y
             edgeVertices[4 * 3 * i + 8] = v2Extracted.z
-
-            edgeVertices[4 * 3 * i + 9] = v1Extracted.x
-            edgeVertices[4 * 3 * i + 10] = v1Extracted.y
-            edgeVertices[4 * 3 * i + 11] = v1Extracted.z
+            
+            edgeVertices[4 * 3 * i + 9] = v2.x
+            edgeVertices[4 * 3 * i + 10] = v2.y
+            edgeVertices[4 * 3 * i + 11] = v2.z
         }
         return edgeVertices
     }
@@ -578,7 +582,7 @@ class TerrainRenderer
     func setupAmbientLightParameters()
     {
         let light0diffuse : [Float] = [ 0, 0, 0, 1 ]
-        let light0ambient : [Float] = [ 0.0, 0.0, 0.0, 1 ]
+        let light0ambient : [Float] = [ 0.2, 0.2, 0.2, 1 ]
         let light0specular : [Float] = [ 0, 0, 0, 1 ]
         
         glEnable( GLenum(GL_LIGHT0) )
@@ -619,6 +623,21 @@ class TerrainRenderer
         glDisableClientState(GLenum(GL_VERTEX_ARRAY))
     }
     
+    func pushShadowEdges()
+    {
+        var edgeIndices : [UInt32] = [UInt32](count: self.edgeVertices!.count / 6,
+                                              repeatedValue: 0)
+        for i in 0..<(edgeIndices.count / 2)
+        {
+            edgeIndices[2 * i + 0] = UInt32(4 * i)
+            edgeIndices[2 * i + 1] = UInt32(4 * i + 3)
+        }
+        glVertexPointer(3, GLenum(GL_FLOAT), 0, self.edgeVertices!)
+        glEnableClientState(GLenum(GL_VERTEX_ARRAY))
+            glDrawElements(GLenum(GL_LINES), GLsizei(edgeIndices.count), GLenum(GL_UNSIGNED_INT), edgeIndices)
+        glDisableClientState(GLenum(GL_VERTEX_ARRAY))
+    }
+    
     /**
      Renders terrain geometry either as triangles or as wireframe.
      Relies on createVertexGeometry(), createVertexColors(),
@@ -648,11 +667,16 @@ class TerrainRenderer
         // front faces of volumes, but currently we don't have any true back faces yet)
         glEnable(GLenum(GL_STENCIL_TEST))
         glStencilFunc( GLenum(GL_ALWAYS), 0, 127)
-        glStencilOp( GLenum(GL_KEEP), GLenum(GL_KEEP), GLenum(GL_INCR) )
-        glDisable(GLenum(GL_CULL_FACE))
-        pushShadowVolumeGeometry()
-        glEnable(GLenum(GL_CULL_FACE))
         
+        glEnable(GLenum(GL_CULL_FACE))
+        glCullFace( GLenum(GL_BACK) )
+        glStencilOp( GLenum(GL_KEEP), GLenum(GL_KEEP), GLenum(GL_INCR) )
+        pushShadowVolumeGeometry()
+        glCullFace( GLenum(GL_FRONT) )
+        glStencilOp( GLenum(GL_KEEP), GLenum(GL_KEEP), GLenum(GL_DECR) )
+        pushShadowVolumeGeometry()
+        
+        glCullFace( GLenum(GL_BACK) )
         glDepthMask( GLboolean(GL_TRUE) )
         glColorMask( GLboolean(GL_TRUE), GLboolean(GL_TRUE), GLboolean(GL_TRUE), GLboolean(GL_TRUE) )
         
@@ -688,14 +712,30 @@ class TerrainRenderer
         
         if(self.showDebugShadowGeometry)
         {
+            // glPolygonOffset(1.0, 1.0)
             glPolygonMode(GLenum(GL_FRONT_AND_BACK), GLenum(GL_LINE))
-            glDisable(GLenum(GL_CULL_FACE))
-            glDisable(GLenum(GL_DEPTH_TEST))
-            glColor4f(1, 1, 1, 1)
+            glEnable(GLenum(GL_CULL_FACE))
+            
+            // glDepthFunc(GLenum(GL_LEQUAL))
+            
+            glCullFace(GLenum(GL_FRONT))
+            // glDisable(GLenum(GL_DEPTH_TEST))
+            glColor4f(1, 0, 0, 1)
             pushShadowVolumeGeometry()
-            glEnable(GLenum(GL_DEPTH_TEST))
+            
+            glCullFace(GLenum(GL_BACK))
+            // glDisable(GLenum(GL_DEPTH_TEST))
+            glColor4f(1, 1, 0, 1)
+            pushShadowVolumeGeometry()
+            
+            // glEnable(GLenum(GL_DEPTH_TEST))
             glEnable(GLenum(GL_CULL_FACE))
             glPolygonMode(GLenum(GL_FRONT_AND_BACK), GLenum(GL_FILL))
+
+            // glDisable(GLenum(GL_DEPTH_TEST))
+            glColor4f(1, 0, 1, 1)
+            pushShadowEdges()
+            glEnable(GLenum(GL_DEPTH_TEST))
         }
         
         // full screen quad

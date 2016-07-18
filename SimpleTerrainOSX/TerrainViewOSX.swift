@@ -19,7 +19,7 @@ class TerrainViewOSX : NSOpenGLView
     override var acceptsFirstResponder: Bool { return true }
     
     let renderer = TerrainRenderer()
-    let qt = QuadTreeTerrain(maxLevel: 7)
+    let qt = QuadTreeTerrain(maxLevel: 8)
     var qtDisplayLevel : Int = 0
     
     var mousePosition : CGPoint = CGPointMake(0, 0)
@@ -101,6 +101,7 @@ class TerrainViewOSX : NSOpenGLView
     override func viewDidMoveToWindow() {
         recreateTerrain()
         renderer.cam = TerrainCamera(terrain: renderer.data!)
+        renderer.zScale = 12
         
 // apparently all the following is unneeded
 //        self.window?.makeKeyWindow()
@@ -208,8 +209,10 @@ class TerrainViewOSX : NSOpenGLView
             renderer.xyScale = Float(1 << (qt.maxLevel - qtDisplayLevel))
         case "g":
             renderer.zScale *= 1.1
+            Swift.print("zScale: \(renderer.zScale)")
         case "h":
             renderer.zScale *= 1.0 / 1.1
+            Swift.print("zScale: \(renderer.zScale)")
         case "n":
             renderer.showDebugNormals = !renderer.showDebugNormals
         case "m":
