@@ -25,6 +25,7 @@ class TerrainFactory
         for level in 0...qt.maxLevel
         {
             qt.crop(level, minHeight: 0.5, maxHeight: 100)
-        }        
+        }
+        qt.setEdge(qt.maxLevel, value: 0.5)
     }
 }

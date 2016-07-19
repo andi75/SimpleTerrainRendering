@@ -4,6 +4,11 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>SimpleTerrainOSX.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 		<key>SimpleTerrainRendering.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -12,6 +17,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>E1444B1B1D3276D5004F5C05</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>F7DD221C1C26BE390082EA63</key>
 		<dict>
 			<key>primary</key>

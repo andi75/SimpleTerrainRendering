@@ -159,5 +159,21 @@ class QuadTreeTerrain
             }
         }
     }
+    
+    /**
+     */
+    
+    func setEdge(level: Int, value : Float)
+    {
+        let curWidth = QuadTreeTerrain.getWidth(level)
+        for i in 0..<curWidth
+        {
+            self.setDataAt(level, x: 0, y: i, value: value)
+            self.setDataAt(level, x: i, y: 0, value: value)
+            self.setDataAt(level, x: curWidth - 1, y: i, value: value)
+            self.setDataAt(level, x: i, y: curWidth - 1, value: value)
+        }
+        
+    }
 
 }
