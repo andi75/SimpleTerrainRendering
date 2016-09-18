@@ -10,7 +10,7 @@ import Foundation
 
 class TerrainFactory
 {
-    class func recreateQuadTerrain(qt: QuadTreeTerrain)
+    class func recreateQuadTerrain(_ qt: QuadTreeTerrain)
     {
         var maxNoise : Float = 15.0
         

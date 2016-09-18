@@ -51,8 +51,8 @@ class TerrainData
     
     init(width: Int, height: Int)
     {
-        self.rect = CGRectMake(0, 0, CGFloat(width), CGFloat(height))
-        self.data = [Float](count: width * height, repeatedValue: 0.0)
+        self.rect = CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height))
+        self.data = [Float](repeating: 0.0, count: width * height)
     }
     
     init(qt : QuadTreeTerrain, level : Int)
@@ -60,8 +60,8 @@ class TerrainData
         let width = QuadTreeTerrain.getWidth(level)
         let height = width
         
-        self.rect = CGRectMake(0, 0, CGFloat(width), CGFloat(height))
-        self.data = [Float](count: width * height, repeatedValue: 0.0)
+        self.rect = CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height))
+        self.data = [Float](repeating: 0.0, count: width * height)
         
         for y in 0..<height
         {
@@ -72,7 +72,7 @@ class TerrainData
         }
     }
     
-    func randomize(min min: Float, max: Float)
+    func randomize(min: Float, max: Float)
     {
         for i in 0 ..< self.data.count
         {
@@ -81,7 +81,7 @@ class TerrainData
         }
     }
     
-    func apply3x3Kernel(kernel: [Float], normalize: Bool)
+    func apply3x3Kernel(_ kernel: [Float], normalize: Bool)
     {
         var scale : Float = 1
         let size = 3
@@ -96,7 +96,7 @@ class TerrainData
             }
         }
         
-        var tmp : [Float] = [Float](count: self.width * self.height, repeatedValue: 0.0)
+        var tmp : [Float] = [Float](repeating: 0.0, count: self.width * self.height)
         
         for y in 0 ..< self.height
         {
@@ -124,7 +124,7 @@ class TerrainData
         self.apply3x3Kernel(kernel, normalize: true)
     }
     
-    func intersectWithRay(origin : GLKVector3, direction: GLKVector3) -> (isHit: Bool, location: GLKVector3)
+    func intersectWithRay(_ origin : GLKVector3, direction: GLKVector3) -> (isHit: Bool, location: GLKVector3)
     {
         // find tile
 //        let xmin : Int = min( max(0, Int( floor(origin.x) )), self.width - 2)

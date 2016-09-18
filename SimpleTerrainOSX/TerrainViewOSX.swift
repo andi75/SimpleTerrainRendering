@@ -22,19 +22,19 @@ class TerrainViewOSX : NSOpenGLView
     let qt = QuadTreeTerrain(maxLevel: 8)
     var qtDisplayLevel : Int = 0
     
-    var mousePosition : CGPoint = CGPointMake(0, 0)
+    var mousePosition : CGPoint = CGPoint(x: 0, y: 0)
     var mouseDown = false
     
     let camMotion = CameraMotion()
     
     override func prepareOpenGL() {
         var swapInt : GLint = 1
-        self.openGLContext?.setValues(&swapInt, forParameter: NSOpenGLContextParameter.GLCPSwapInterval)
+        self.openGLContext?.setValues(&swapInt, for: NSOpenGLContextParameter.swapInterval)
         
         // copied some code from https://forums.developer.apple.com/thread/23142
         
         //  The callback function is called everytime CVDisplayLink says its time to get a new frame.
-        func displayLinkOutputCallback(displayLink: CVDisplayLink, _ inNow: UnsafePointer<CVTimeStamp>, _ inOutputTime: UnsafePointer<CVTimeStamp>, _ flagsIn: CVOptionFlags, _ flagsOut: UnsafeMutablePointer<CVOptionFlags>, _ displayLinkContext: UnsafeMutablePointer<Void>) -> CVReturn {
+        func displayLinkOutputCallback(_ displayLink: CVDisplayLink, _ inNow: UnsafePointer<CVTimeStamp>, _ inOutputTime: UnsafePointer<CVTimeStamp>, _ flagsIn: CVOptionFlags, _ flagsOut: UnsafeMutablePointer<CVOptionFlags>, _ displayLinkContext: UnsafeMutableRawPointer) -> CVReturn {
             
             /*  The displayLinkContext is CVDisplayLink's parameter definition of the view in which we are working.
              In order to access the methods of a given view we need to specify what kind of view it is as right
@@ -43,7 +43,7 @@ class TerrainViewOSX : NSOpenGLView
              an unsafeBitCast.  The definition of which states, "Returns the the bits of x, interpreted as having
              type U."  We may then call any of that view's methods.  Here we call drawView() which we draw a
              frame for rendering.  */
-            unsafeBitCast(displayLinkContext, TerrainViewOSX.self).updateFrame()
+            unsafeBitCast(displayLinkContext, to: TerrainViewOSX.self).updateFrame()
             
             //  We are going to assume that everything went well for this mock up, and pass success as the CVReturn
             return kCVReturnSuccess
@@ -54,12 +54,12 @@ class TerrainViewOSX : NSOpenGLView
          (i.e. a function defined within the class) is NOT allowed. */
         //  The UnsafeMutablePointer<Void>(unsafeAddressOf(self)) passes a pointer to the instance of our class.
         CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
-        CVDisplayLinkSetOutputCallback(displayLink!, displayLinkOutputCallback, UnsafeMutablePointer<Void>(unsafeAddressOf(self)))
+        CVDisplayLinkSetOutputCallback(displayLink!, displayLinkOutputCallback, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
         CVDisplayLinkStart(displayLink!)
         CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
         
     }
-    override func drawRect(dirtyRect: NSRect) {
+    override func draw(_ dirtyRect: NSRect) {
         renderer.render(width: self.frame.width, height: self.frame.height)
         glFlush()
     }
@@ -113,11 +113,11 @@ class TerrainViewOSX : NSOpenGLView
         // self.window?.acceptsMouseMovedEvents = true
     }
     
-    override func acceptsFirstMouse(theEvent: NSEvent?) -> Bool {
+    override func acceptsFirstMouse(for theEvent: NSEvent?) -> Bool {
         return true
     }
     
-    override func mouseDown(theEvent: NSEvent) {
+    override func mouseDown(with theEvent: NSEvent) {
 //        Swift.print("mouse down")
         // CGDisplayHideCursor(kCGDirectMainDisplay)
         CGDisplayHideCursor(0)
@@ -128,7 +128,7 @@ class TerrainViewOSX : NSOpenGLView
         CGGetLastMouseDelta(&dx, &dy)
     }
     
-    override func mouseUp(theEvent: NSEvent) {
+    override func mouseUp(with theEvent: NSEvent) {
 //        Swift.print("mouse up")
         // CGDisplayShowCursor(kCGDirectMainDisplay)
         CGAssociateMouseAndMouseCursorPosition(1)
@@ -138,7 +138,7 @@ class TerrainViewOSX : NSOpenGLView
 //    override func mouseMoved(theEvent: NSEvent) {
 //    }
     
-    override func mouseDragged(theEvent: NSEvent) {
+    override func mouseDragged(with theEvent: NSEvent) {
         var dx : Int32 = 0, dy : Int32 = 0
         CGGetLastMouseDelta(&dx, &dy)
         // Swift.print("delta: \(dx), \(dy)")
@@ -149,7 +149,7 @@ class TerrainViewOSX : NSOpenGLView
         self.needsDisplay = true
     }
     
-    override func keyDown(theEvent: NSEvent) {
+    override func keyDown(with theEvent: NSEvent) {
         // Swift.print("key down")
         let s = theEvent.charactersIgnoringModifiers
         switch(s!)
@@ -165,7 +165,7 @@ class TerrainViewOSX : NSOpenGLView
         }
     }
     
-    override func keyUp(theEvent: NSEvent)
+    override func keyUp(with theEvent: NSEvent)
     {
         let s = theEvent.charactersIgnoringModifiers
         switch(s!)
@@ -183,7 +183,7 @@ class TerrainViewOSX : NSOpenGLView
 
     }
     
-    override func insertText(insertString: AnyObject) {
+    override func insertText(_ insertString: Any) {
         let s = insertString as! String
 
         switch(s)

@@ -21,10 +21,10 @@ class TriangleAdjancency
     init(indices : [UInt32], vertexCount : Int)
     {
         let triangleCount = indices.count / 3
-        adjacency = [Int](count: triangleCount * 3, repeatedValue: -1)
+        adjacency = [Int](repeating: -1, count: triangleCount * 3)
         
         // foreach vertex, count in how many triangle it is
-        var vertexOrder = [Int](count: vertexCount, repeatedValue: 0)
+        var vertexOrder = [Int](repeating: 0, count: vertexCount)
         for i in 0..<triangleCount
         {
             for j in 0..<3
@@ -34,7 +34,7 @@ class TriangleAdjancency
         }
         // foreach vertex, store the list of triangles it is part of
         // first: compute the offsets where we store those lists in one big array
-        var vertexTriangleListOffset = [Int](count: vertexCount, repeatedValue: 0)
+        var vertexTriangleListOffset = [Int](repeating: 0, count: vertexCount)
         var currentOffset = 0
         for i in 0..<vertexCount
         {
@@ -46,8 +46,8 @@ class TriangleAdjancency
         // in order to keep track where to store the vertices, we need to keep
         // a list of the amount of triangles we already found for each vertex
         // so we can compute the total offset into our buffer
-        var tmpTriangleOffset = [Int](count: vertexCount, repeatedValue: 0)
-        var vertexTriangleList = [Int](count: triangleCount * 3, repeatedValue: -1)
+        var tmpTriangleOffset = [Int](repeating: 0, count: vertexCount)
+        var vertexTriangleList = [Int](repeating: -1, count: triangleCount * 3)
         for i in 0..<triangleCount
         {
             for j in 0..<3

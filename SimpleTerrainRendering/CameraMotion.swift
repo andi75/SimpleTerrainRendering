@@ -29,7 +29,7 @@ class CameraMotion
         down = false
     }
     
-    func move(dt dt : Float, speed: Float, cam: TerrainCamera)
+    func move(dt : Float, speed: Float, cam: TerrainCamera)
     {
 //        print("before: \(GLKV3toString(cam.eye))")
         if(forward) { cam.forwardBackwardPlanar(dt * speed) }

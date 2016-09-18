@@ -19,7 +19,7 @@ class QuadTreeTerrain
      - returns: index of the first element for the current level's data
      - paramter level: the current quadtree level
      */
-    class func getOffset(level : Int) -> Int
+    class func getOffset(_ level : Int) -> Int
     {
         var offset = 0
         for i in 0..<level
@@ -37,12 +37,12 @@ class QuadTreeTerrain
      - returns: amount of data points per row/column
      - parameter level: the current quadtree level
      */
-    class func getWidth(level : Int) -> Int
+    class func getWidth(_ level : Int) -> Int
     {
         return (1 << level) + 1
     }
     
-    class func getNextLevelXYOrigin(currentLevel: Int, currentX: Int, currentY: Int) -> (nextX: Int, nextY: Int)
+    class func getNextLevelXYOrigin(_ currentLevel: Int, currentX: Int, currentY: Int) -> (nextX: Int, nextY: Int)
     {
         let width = QuadTreeTerrain.getWidth(currentLevel)
         return (nextX: currentX * width, nextY: currentY * width)
@@ -53,7 +53,7 @@ class QuadTreeTerrain
      Gets the data at the x/y coordinates of the specified level
      - returns: data at the x/y coordinates of the specified level
      */
-    func getDataAt(level: Int, x: Int, y: Int) -> Float
+    func getDataAt(_ level: Int, x: Int, y: Int) -> Float
     {
         return data[QuadTreeTerrain.getOffset(level) + y * QuadTreeTerrain.getWidth(level) + x]
     }
@@ -61,7 +61,7 @@ class QuadTreeTerrain
     /**
      Sets the data at the x/y coordinates of the specified level
      */
-    func setDataAt(level: Int, x: Int, y: Int, value: Float)
+    func setDataAt(_ level: Int, x: Int, y: Int, value: Float)
     {
         data[QuadTreeTerrain.getOffset(level) + y * QuadTreeTerrain.getWidth(level) + x] = value
     }
@@ -70,7 +70,7 @@ class QuadTreeTerrain
     {
         self.maxLevel = maxLevel
         let size = QuadTreeTerrain.getOffset(maxLevel + 1)
-        self.data = [Float](count: size, repeatedValue: 0.0)
+        self.data = [Float](repeating: 0.0, count: size)
     }
     
     /**
@@ -80,7 +80,7 @@ class QuadTreeTerrain
      
     - paramter upperLevel: The level that contains the data to be copied and interpolated
     */
-    func copyFromUpperLevel(upperLevel : Int)
+    func copyFromUpperLevel(_ upperLevel : Int)
     {
         if(upperLevel >= maxLevel)
         {
@@ -127,7 +127,7 @@ class QuadTreeTerrain
      Adds random noise ranging from -maxNoise/2 to maxNoise/2
      the specified level
      */
-    func addRandomNoiseToLevel(level: Int, maxNoise: Float)
+    func addRandomNoiseToLevel(_ level: Int, maxNoise: Float)
     {
         let curWidth = QuadTreeTerrain.getWidth(level)
         
@@ -146,7 +146,7 @@ class QuadTreeTerrain
      Crops the data in the specified level to the
      range [minHeight, maxHeight]
      */
-    func crop(level: Int, minHeight: Float, maxHeight: Float)
+    func crop(_ level: Int, minHeight: Float, maxHeight: Float)
     {
         let curWidth = QuadTreeTerrain.getWidth(level)
         
@@ -163,7 +163,7 @@ class QuadTreeTerrain
     /**
      */
     
-    func setEdge(level: Int, value : Float)
+    func setEdge(_ level: Int, value : Float)
     {
         let curWidth = QuadTreeTerrain.getWidth(level)
         for i in 0..<curWidth

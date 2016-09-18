@@ -85,7 +85,7 @@ class TerrainRenderer
         isValidIndices = false
     }
     
-    func checkGLError( message : String )
+    func checkGLError( _ message : String )
     {
         let error = glGetError()
         if(error != 0)
@@ -94,7 +94,7 @@ class TerrainRenderer
         }
     }
     
-    func render(width width : CGFloat, height : CGFloat) {
+    func render(width : CGFloat, height : CGFloat) {
 //        print("render() called")
         checkGLError("before frame")
         
@@ -119,7 +119,7 @@ class TerrainRenderer
         checkGLError("after frame")
     }
     
-    func glMatrix(mat : GLKMatrix4) -> [Float]
+    func glMatrix(_ mat : GLKMatrix4) -> [Float]
     {
         return [
             mat.m00, mat.m01, mat.m02, mat.m03,
@@ -129,7 +129,7 @@ class TerrainRenderer
         ]
     }
     
-    func renderTerrain(width width : CGFloat, height : CGFloat, terrain : TerrainData)
+    func renderTerrain(width : CGFloat, height : CGFloat, terrain : TerrainData)
     {
         glMatrixMode(GLenum(GL_PROJECTION))
         // let proj = GLKMatrix4MakeOrtho(0, Float(terrain.width), 0, Float(terrain.height), 0, 100)
@@ -213,7 +213,7 @@ class TerrainRenderer
         }
     }
     
-    class func terrainColor(t : Float) -> [Float]
+    class func terrainColor(_ t : Float) -> [Float]
     {
         let colorsAndLimits : [(Float, [Float])] = [
             (0.01, [ 0, 0, 1, 1 ]),
@@ -252,12 +252,12 @@ class TerrainRenderer
         return lastColor!
     }
 
-    class func createVertexColors(terrain: TerrainData) -> [Float]
+    class func createVertexColors(_ terrain: TerrainData) -> [Float]
     {
         let min = terrain.minHeight
         let max = terrain.maxHeight
         
-        var colors : [Float] = [Float](count: terrain.width * terrain.height * 4, repeatedValue: 1.0)
+        var colors : [Float] = [Float](repeating: 1.0, count: terrain.width * terrain.height * 4)
         for y in 0 ..< terrain.height
         {
             for x in 0 ..< terrain.width
@@ -276,11 +276,11 @@ class TerrainRenderer
         return colors
     }
 
-    class func createFaceNormals(vertices: [Float], indices: [UInt32]) -> [Float]
+    class func createFaceNormals(_ vertices: [Float], indices: [UInt32]) -> [Float]
     {
         let nFaces : Int = indices.count / 3
         
-        var faceNormals : [Float] = [Float](count: 3 * nFaces, repeatedValue: 0)
+        var faceNormals : [Float] = [Float](repeating: 0, count: 3 * nFaces)
         
         for i in 0..<nFaces
         {
@@ -308,14 +308,14 @@ class TerrainRenderer
         return faceNormals
     }
     
-    class func createShadowGeometry(vertices: [Float], indices: [UInt32], faceNormals: [Float], adjacency: [Int], lightDirection: GLKVector3) -> [Float]
+    class func createShadowGeometry(_ vertices: [Float], indices: [UInt32], faceNormals: [Float], adjacency: [Int], lightDirection: GLKVector3) -> [Float]
     {
         let shadowVolume = ShadowVolume(vertices: vertices, indices: indices, adjacency: adjacency, faceNormals: faceNormals)
         shadowVolume.computeSilouette(lightDirection)
         
         let edgeVertexCount = 2 * shadowVolume.silouette!.count
         let edgeQuads = shadowVolume.silouette!.count / 2
-        var edgeVertices = [Float](count: edgeVertexCount * 3, repeatedValue: 0)
+        var edgeVertices = [Float](repeating: 0, count: edgeVertexCount * 3)
         
 
         let lightDirNormalized = GLKVector3Normalize(lightDirection)
@@ -367,11 +367,11 @@ class TerrainRenderer
         return edgeVertices
     }
     
-    class func createVertexGeometry(terrain: TerrainData, xyScale : Float, zScale : Float) -> [Float]
+    class func createVertexGeometry(_ terrain: TerrainData, xyScale : Float, zScale : Float) -> [Float]
     {
         let vertexCount = terrain.width * terrain.height
         
-        var vertices : [Float] = [Float](count: vertexCount * 3, repeatedValue: 0.0)
+        var vertices : [Float] = [Float](repeating: 0.0, count: vertexCount * 3)
         
         for y in 0 ..< terrain.height
         {
@@ -386,11 +386,11 @@ class TerrainRenderer
         return vertices
     }
     
-    class func createNormalGeometry(terrain: TerrainData, xyScale: Float, zScale: Float) -> [Float]
+    class func createNormalGeometry(_ terrain: TerrainData, xyScale: Float, zScale: Float) -> [Float]
     {
         let vertexCount = terrain.width * terrain.height
         
-        var normals : [Float] = [Float](count: vertexCount * 3, repeatedValue: 0.0)
+        var normals : [Float] = [Float](repeating: 0.0, count: vertexCount * 3)
         
         for y in 0 ..< terrain.height
         {
@@ -420,10 +420,10 @@ class TerrainRenderer
         return normals
     }
     
-    class func createWireframeIndices(terrain: TerrainData, triangulationType: Int) -> [UInt32]
+    class func createWireframeIndices(_ terrain: TerrainData, triangulationType: Int) -> [UInt32]
     {
         let primitiveCount = (terrain.width - 1) * (terrain.height - 1) * 5
-        var indices : [UInt32] = [UInt32](count: primitiveCount * 2, repeatedValue: 0)
+        var indices : [UInt32] = [UInt32](repeating: 0, count: primitiveCount * 2)
         
         var primitive = 0;
         
@@ -476,10 +476,10 @@ class TerrainRenderer
         
     }
     
-    class func createTriangleIndices(terrain: TerrainData, triangulationType: Int) -> [UInt32]
+    class func createTriangleIndices(_ terrain: TerrainData, triangulationType: Int) -> [UInt32]
     {
         let primitiveCount = (terrain.width - 1) * (terrain.height - 1) * 2
-        var indices : [UInt32] = [UInt32](count: primitiveCount * 3, repeatedValue: 0)
+        var indices : [UInt32] = [UInt32](repeating: 0, count: primitiveCount * 3)
         
         var triangle = 0;
         
@@ -532,8 +532,8 @@ class TerrainRenderer
     func createDebugNormalGeometry()
     {
         self.normalVertexcount = 2 * self.vertexCount
-        self.normalVertices = [Float](count: self.normalVertexcount * 3, repeatedValue: 0.0)
-        self.normalColors = [Float](count: self.normalVertexcount * 4, repeatedValue: 0.0)
+        self.normalVertices = [Float](repeating: 0.0, count: self.normalVertexcount * 3)
+        self.normalColors = [Float](repeating: 0.0, count: self.normalVertexcount * 4)
         
         for i in 0 ..< self.vertexCount
         {
@@ -625,8 +625,8 @@ class TerrainRenderer
     
     func pushShadowEdges()
     {
-        var edgeIndices : [UInt32] = [UInt32](count: self.edgeVertices!.count / 6,
-                                              repeatedValue: 0)
+        var edgeIndices : [UInt32] = [UInt32](repeating: 0,
+                                              count: self.edgeVertices!.count / 6)
         for i in 0..<(edgeIndices.count / 2)
         {
             edgeIndices[2 * i + 0] = UInt32(4 * i)
@@ -759,7 +759,7 @@ class TerrainRenderer
 //        glEnable(GLenum(GL_DEPTH_TEST))
     }
     
-    func drawFullScreenQuad(size: Float)
+    func drawFullScreenQuad(_ size: Float)
     {
         glMatrixMode(GLenum(GL_PROJECTION))
         glLoadIdentity()
@@ -774,7 +774,7 @@ class TerrainRenderer
     }
     
     
-    func drawCamera(cam : TerrainCamera)
+    func drawCamera(_ cam : TerrainCamera)
     {
         // TODO: untestet, unused
         let upDir = GLKVector3MultiplyScalar(cam.up, 10)
@@ -806,7 +806,7 @@ class TerrainRenderer
         TerrainRenderer.drawAsLines(vertices, colors: colors)
     }
     
-    class func drawAsLines(vertices : [Float], colors : [Float])
+    class func drawAsLines(_ vertices : [Float], colors : [Float])
     {
         glVertexPointer(3, GLenum(GL_FLOAT), 0, vertices)
         glColorPointer(4, GLenum(GL_FLOAT), 0, colors)
@@ -835,7 +835,7 @@ class TerrainRenderer
         glDisableClientState(GLenum(GL_VERTEX_ARRAY))
     }
     
-    class func simpleTetrahedron(size : Float, location : GLKVector3)
+    class func simpleTetrahedron(_ size : Float, location : GLKVector3)
     {
         // TODO: render edges as well (in a contrast color)
         let cos30 = cos( Float(M_PI / 6.0) )
@@ -865,7 +865,7 @@ class TerrainRenderer
         glDisableClientState(GLenum(GL_VERTEX_ARRAY))
     }
     
-    class func intersect(origin : GLKVector3, direction : GLKVector3) -> GLKVector3
+    class func intersect(_ origin : GLKVector3, direction : GLKVector3) -> GLKVector3
     {
         // find the square origion contains
         // check intersection for both triangles in that square

@@ -31,7 +31,7 @@ class ShadowVolume
         assert(adjacency.count == indices.count)
     }
     
-    func computeSilouette(lightDirection : GLKVector3)
+    func computeSilouette(_ lightDirection : GLKVector3)
     {
         // TODO: untested and unused
         assert(
@@ -41,7 +41,7 @@ class ShadowVolume
         )
         
         let triangles = indices.count / 3
-        var dotSigns = [Float](count: indices.count / 3, repeatedValue: 0)
+        var dotSigns = [Float](repeating: 0, count: indices.count / 3)
         
         // for each triangle, compute the signs of the dotproduct
         // between the face normal and the light direction
@@ -81,7 +81,7 @@ class ShadowVolume
             }
         }
         
-        self.silouette = [Int](count : edgeCount * 2, repeatedValue: 0)
+        self.silouette = [Int](repeating: 0, count: edgeCount * 2)
         var currentEdge = 0
         for i in 0..<triangles
         {
@@ -113,8 +113,8 @@ class ShadowVolume
         
         var currentFrontFace = 0
         var currentBackFace = 0
-        self.frontFaces = [UInt32](count: frontFaceCount * 3, repeatedValue: 0)
-        self.backFaces = [UInt32](count: backFaceCount * 3, repeatedValue : 0)
+        self.frontFaces = [UInt32](repeating: 0, count: frontFaceCount * 3)
+        self.backFaces = [UInt32](repeating: 0, count: backFaceCount * 3)
 
         for i in 0..<triangles
         {

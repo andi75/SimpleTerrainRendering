@@ -71,13 +71,13 @@ class TerrainCamera {
         self.chi = 0 // -Float(M_PI) / 4
     }
     
-    func forwardBackward(d : Float)
+    func forwardBackward(_ d : Float)
     {
         let viewDirScaled = GLKVector3MultiplyScalar(self.viewDir, d)
         self.eye = GLKVector3Add(self.eye, viewDirScaled)
     }
     
-    func forwardBackwardPlanar(d : Float)
+    func forwardBackwardPlanar(_ d : Float)
     {
         let viewHorizontal = GLKVector3Make(self.viewDir.x, self.viewDir.y, 0)
         let viewHorizontalNormalized = GLKVector3Normalize(viewHorizontal)
@@ -86,19 +86,19 @@ class TerrainCamera {
     }
     
     
-    func leftRight(d : Float)
+    func leftRight(_ d : Float)
     {
         let rightScaled = GLKVector3MultiplyScalar(self.right, d)
         self.eye = GLKVector3Add(self.eye, rightScaled)
     }
     
-    func lowerHigher(d : Float)
+    func lowerHigher(_ d : Float)
     {
         let zScaled = GLKVector3Make(0, 0, d)
         self.eye = GLKVector3Add(self.eye, zScaled)
     }
     
-    func lowerHigherWithFocus(d : Float, focus : GLKVector3)
+    func lowerHigherWithFocus(_ d : Float, focus : GLKVector3)
     {
         let zScaled = GLKVector3Make(0, 0, d)
         self.eye = GLKVector3Add(self.eye, zScaled)
@@ -111,7 +111,7 @@ class TerrainCamera {
 
     }
     
-    func zoomInOrOut(scale : Float)
+    func zoomInOrOut(_ scale : Float)
     {
         var vScale : Float
         if(scale < 1)

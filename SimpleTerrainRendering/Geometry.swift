@@ -12,12 +12,12 @@ import GLKit
 
 let epsilon : Float = 0.000001
 
-func GLKV3toString(v : GLKVector3) -> String
+func GLKV3toString(_ v : GLKVector3) -> String
 {
     return "(\(v.x), \(v.y), \(v.z))"
 }
 
-func intersectTriangleWithRay(v1 : GLKVector3, v2 : GLKVector3, v3 : GLKVector3, origin: GLKVector3, direction: GLKVector3) -> (isHit: Bool, t: Float)
+func intersectTriangleWithRay(_ v1 : GLKVector3, v2 : GLKVector3, v3 : GLKVector3, origin: GLKVector3, direction: GLKVector3) -> (isHit: Bool, t: Float)
 {
 //    print("Triangle: \(GLKV3toString(v1)), \(GLKV3toString(v2)), \(GLKV3toString(v3))")
     
