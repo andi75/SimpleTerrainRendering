@@ -27,7 +27,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     let qt = QuadTreeTerrain(maxLevel: 7)
     
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         if(
             (gestureRecognizer == singlePan && otherGestureRecognizer == doublePan) ||
             (gestureRecognizer == doublePan && otherGestureRecognizer == singlePan)
@@ -50,12 +50,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         recreateTerrain()
         
-        terrainView!.context = EAGLContext(API: .OpenGLES1)
+        terrainView!.context = EAGLContext(api: .openGLES1)
         terrainView!.renderer.cam = TerrainCamera(terrain: terrainView!.renderer.data!)
         
         singleTap.delaysTouchesBegan = true
         doubleTap.delaysTouchesBegan = true
-        singleTap.requireGestureRecognizerToFail(doubleTap)
+        singleTap.require(toFail: doubleTap)
         
 //        singlePan.delaysTouchesBegan = true
 //        doublePan.delaysTouchesBegan = true
@@ -64,7 +64,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 //        doublePan.delegate = self
         
         
-        self.solidWireFrameSwitch?.on = terrainView.renderer.isWireframe
+        self.solidWireFrameSwitch?.isOn = terrainView.renderer.isWireframe
         self.triangulationTypeSegementedControl?.selectedSegmentIndex = terrainView.renderer.triangulationType
     }
 
@@ -73,7 +73,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         // Dispose of any resources that can be recreated.
     }
 
-    @IBAction func viewTapped(sender: UITapGestureRecognizer) {
+    @IBAction func viewTapped(_ sender: UITapGestureRecognizer) {
         // only do this once at the moment, but might actually make this user editable
         let interations = 1
         for _ in 0..<interations
@@ -84,17 +84,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         print("smoothed")
     }
     
-    @IBAction func viewDoubletapped(sender: UITapGestureRecognizer) {
+    @IBAction func viewDoubletapped(_ sender: UITapGestureRecognizer) {
         recreateTerrain()
         terrainView.setNeedsDisplay()
         print("randomized")
     }
     
-    @IBAction func turnViewPoint(sender: UIPanGestureRecognizer) {
+    @IBAction func turnViewPoint(_ sender: UIPanGestureRecognizer) {
         
-        if(sender.state == .Changed)
+        if(sender.state == .changed)
         {
-            let delta = sender.translationInView(terrainView)
+            let delta = sender.translation(in: terrainView)
          
 //            print("(turnView by \(delta.x), \(delta.y)")
             
@@ -110,32 +110,32 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
 //            {
 //                terrainView.distance /= 0.95
 //            }
-            sender.setTranslation(CGPointZero, inView: terrainView)
+            sender.setTranslation(CGPoint.zero, in: terrainView)
             // print(sender.translationInView(terrainView))
             terrainView.setNeedsDisplay()
         }
     }
 
-    @IBAction func moveLeftRightForwardBackwardPlanar(sender: UIPanGestureRecognizer) {
-        if(sender.state == .Changed)
+    @IBAction func moveLeftRightForwardBackwardPlanar(_ sender: UIPanGestureRecognizer) {
+        if(sender.state == .changed)
         {
-            let delta = sender.translationInView(terrainView)
+            let delta = sender.translation(in: terrainView)
             
             print("(moveLeftRightForwardBackward by \(delta.x), \(delta.y)")
 
             terrainView.renderer.cam?.forwardBackwardPlanar(Float(-delta.y))
             terrainView.renderer.cam?.leftRight(Float(delta.x))
             
-            sender.setTranslation(CGPointZero, inView: terrainView)
+            sender.setTranslation(CGPoint.zero, in: terrainView)
             // print(sender.translationInView(terrainView))
             terrainView.setNeedsDisplay()
         }
     }
     
-    @IBAction func moveUpDown(sender: UIPanGestureRecognizer) {
-        if(sender.state == .Changed)
+    @IBAction func moveUpDown(_ sender: UIPanGestureRecognizer) {
+        if(sender.state == .changed)
         {
-            let delta = sender.translationInView(terrainView)
+            let delta = sender.translation(in: terrainView)
             
 //            print("(moveUpDown by \(delta.x), \(delta.y)")
 
@@ -153,17 +153,17 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
                 terrainView.renderer.cam?.lowerHigher(Float(delta.y))
             }
 
-            sender.setTranslation(CGPointZero, inView: terrainView)
+            sender.setTranslation(CGPoint.zero, in: terrainView)
             // print(sender.translationInView(terrainView))
             terrainView.setNeedsDisplay()
         }
     }
-    @IBAction func zoomInOrOut(sender: UIPinchGestureRecognizer) {
-        if(sender.state == .Began)
+    @IBAction func zoomInOrOut(_ sender: UIPinchGestureRecognizer) {
+        if(sender.state == .began)
         {
             self.lastZoom = 1
         }
-        if(sender.state == .Changed)
+        if(sender.state == .changed)
         {
             print("scale: \(sender.scale), velocity: \(sender.velocity)")
             terrainView.renderer.cam?.zoomInOrOut(Float(sender.scale) / self.lastZoom)
@@ -172,11 +172,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         terrainView.setNeedsDisplay()
     }
     
-    @IBAction func solidWireFrameSwitched(sender: UISwitch) {
-        self.terrainView.renderer.isWireframe = sender.on
+    @IBAction func solidWireFrameSwitched(_ sender: UISwitch) {
+        self.terrainView.renderer.isWireframe = sender.isOn
         self.terrainView.setNeedsDisplay()
     }
-    @IBAction func triangulationTypeChanged(sender: UISegmentedControl) {
+    @IBAction func triangulationTypeChanged(_ sender: UISegmentedControl) {
         self.terrainView.renderer.triangulationType = sender.selectedSegmentIndex
         self.terrainView.setNeedsDisplay()
     }

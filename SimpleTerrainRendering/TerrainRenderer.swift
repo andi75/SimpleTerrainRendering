@@ -15,7 +15,6 @@
     import OpenGL
     import GLKit
     import GLUT
-    let M_PI = Darwin.M_PI
 #endif
 
 // import GLKit
@@ -94,7 +93,7 @@ class TerrainRenderer
         }
     }
     
-    func render(width : CGFloat, height : CGFloat) {
+    func renderTerrain(width : CGFloat, height : CGFloat) {
 //        print("render() called")
         checkGLError("before frame")
         
@@ -110,7 +109,7 @@ class TerrainRenderer
         
         if(self.data != nil && self.cam != nil)
         {
-            renderTerrain(width: width, height: height, terrain: data!)
+            renderTerrain(width, height: height, terrain: data!)
         }
         else
         {
@@ -129,14 +128,14 @@ class TerrainRenderer
         ]
     }
     
-    func renderTerrain(width : CGFloat, height : CGFloat, terrain : TerrainData)
+    func renderTerrain(_ width : CGFloat, height : CGFloat, terrain : TerrainData)
     {
         glMatrixMode(GLenum(GL_PROJECTION))
         // let proj = GLKMatrix4MakeOrtho(0, Float(terrain.width), 0, Float(terrain.height), 0, 100)
         let d = Float(terrain.width) * xyScale
         
         // let proj = GLKMatrix4MakeOrtho(-d, d, -d, d, 0, 4 * d)
-        let proj = GLKMatrix4MakePerspective( Float(M_PI) / 4.0, Float(width / height), 2.0,  2 * d)
+        let proj = GLKMatrix4MakePerspective( .pi / 4.0, Float(width / height), 2.0,  2 * d)
         glLoadMatrixf(glMatrix(proj))
         
         glMatrixMode(GLenum(GL_MODELVIEW))
@@ -838,8 +837,8 @@ class TerrainRenderer
     class func simpleTetrahedron(_ size : Float, location : GLKVector3)
     {
         // TODO: render edges as well (in a contrast color)
-        let cos30 = cos( Float(M_PI / 6.0) )
-        let sin30 = sin( Float(M_PI / 6.0) )
+        let cos30 : Float = cos( .pi / 6.0 )
+        let sin30 : Float = sin( .pi / 6.0 )
         var vertices : [Float] = [
             0, 0, 1,
             cos30, 0, -sin30,

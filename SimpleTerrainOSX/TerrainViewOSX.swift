@@ -27,40 +27,27 @@ class TerrainViewOSX : NSOpenGLView
     
     let camMotion = CameraMotion()
     
+    deinit {
+        CVDisplayLinkStop(displayLink!)
+    }
+    
     override func prepareOpenGL() {
         var swapInt : GLint = 1
         self.openGLContext?.setValues(&swapInt, for: NSOpenGLContextParameter.swapInterval)
-        
-        // copied some code from https://forums.developer.apple.com/thread/23142
-        
-        //  The callback function is called everytime CVDisplayLink says its time to get a new frame.
-        func displayLinkOutputCallback(_ displayLink: CVDisplayLink, _ inNow: UnsafePointer<CVTimeStamp>, _ inOutputTime: UnsafePointer<CVTimeStamp>, _ flagsIn: CVOptionFlags, _ flagsOut: UnsafeMutablePointer<CVOptionFlags>, _ displayLinkContext: UnsafeMutableRawPointer) -> CVReturn {
-            
-            /*  The displayLinkContext is CVDisplayLink's parameter definition of the view in which we are working.
-             In order to access the methods of a given view we need to specify what kind of view it is as right
-             now the UnsafeMutablePointer<Void> just means we have a pointer to "something".  To cast the pointer
-             such that the compiler at runtime can access the methods associated with our SwiftOpenGLView, we use
-             an unsafeBitCast.  The definition of which states, "Returns the the bits of x, interpreted as having
-             type U."  We may then call any of that view's methods.  Here we call drawView() which we draw a
-             frame for rendering.  */
+
+        // copied from https://3d.bk.tudelft.nl/ken/en/2016/11/05/swift-3-and-opengl.html
+        func displayLinkOutputCallback(displayLink: CVDisplayLink, _ now: UnsafePointer<CVTimeStamp>, _ outputTime: UnsafePointer<CVTimeStamp>, _ flagsIn: CVOptionFlags, _ flagsOut: UnsafeMutablePointer<CVOptionFlags>, _ displayLinkContext: UnsafeMutableRawPointer?) -> CVReturn {
             unsafeBitCast(displayLinkContext, to: TerrainViewOSX.self).updateFrame()
-            
-            //  We are going to assume that everything went well for this mock up, and pass success as the CVReturn
             return kCVReturnSuccess
         }
         
-        //  Grab the a link to the active displays, set the callback defined above, and start the link.
-        /*  An alternative to a nested function is a global function or a closure passed as the argument--a local function
-         (i.e. a function defined within the class) is NOT allowed. */
-        //  The UnsafeMutablePointer<Void>(unsafeAddressOf(self)) passes a pointer to the instance of our class.
         CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
         CVDisplayLinkSetOutputCallback(displayLink!, displayLinkOutputCallback, UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
         CVDisplayLinkStart(displayLink!)
-        CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
-        
     }
+
     override func draw(_ dirtyRect: NSRect) {
-        renderer.render(width: self.frame.width, height: self.frame.height)
+        renderer.renderTerrain(width: self.frame.width, height: self.frame.height)
         glFlush()
     }
     
@@ -124,8 +111,7 @@ class TerrainViewOSX : NSOpenGLView
         CGAssociateMouseAndMouseCursorPosition(0)
         
         // throw away first delta
-        var dx : Int32 = 0, dy : Int32 = 0
-        CGGetLastMouseDelta(&dx, &dy)
+        let(_, _) = CGGetLastMouseDelta()
     }
     
     override func mouseUp(with theEvent: NSEvent) {
@@ -139,8 +125,7 @@ class TerrainViewOSX : NSOpenGLView
 //    }
     
     override func mouseDragged(with theEvent: NSEvent) {
-        var dx : Int32 = 0, dy : Int32 = 0
-        CGGetLastMouseDelta(&dx, &dy)
+        let (dx, dy) = CGGetLastMouseDelta()
         // Swift.print("delta: \(dx), \(dy)")
         
         renderer.cam?.phi += Float(-dx) * 0.01

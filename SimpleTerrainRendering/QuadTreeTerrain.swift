@@ -136,7 +136,7 @@ class QuadTreeTerrain
             for x in 0..<curWidth
             {
                 // TODO: it might make sense to change this to maxNoise * rand(-1 from 1)
-                let noise = maxNoise * (0.5 - (Float(random()) / Float(RAND_MAX)))
+                let noise = maxNoise * (0.5 - Float(arc4random_uniform(10000)) / 10000.0)
                 self.setDataAt(level, x: x, y: y,
                                value: noise + self.getDataAt(level, x: x, y: y))
             }

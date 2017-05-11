@@ -11,13 +11,5 @@ import Cocoa
 class ViewController: NSViewController {
 
     @IBOutlet weak var terrainViewOSX: TerrainViewOSX!
-
-    override var representedObject: AnyObject? {
-        didSet {
-        // Update the view, if already loaded.
-        }
-    }
-
-
 }
 

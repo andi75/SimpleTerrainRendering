@@ -12,8 +12,8 @@ class SimpleTerrainView : GLKView
 {
     let renderer = TerrainRenderer()
     
-    override func drawRect(rect: CGRect) {
-        renderer.render(width: self.frame.width, height: self.frame.height)
+    override func draw(_ rect: CGRect) {
+        renderer.renderTerrain(width: self.frame.width, height: self.frame.height)
     }
 }
 

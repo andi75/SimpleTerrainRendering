@@ -1,4 +1,4 @@
-//
+ //
 //  CameraMotion.swift
 //  SimpleTerrainRendering
 //

@@ -72,11 +72,11 @@ class TerrainData
         }
     }
     
-    func randomize(min: Float, max: Float)
+    func randomize(_ min: Float, max: Float)
     {
         for i in 0 ..< self.data.count
         {
-            self.data[i] = min + (max - min) * (Float(random()) / Float(RAND_MAX))
+            self.data[i] = min + (max - min) * Float(arc4random_uniform(10000)) / 10000.0
             // print(data[i])
         }
     }

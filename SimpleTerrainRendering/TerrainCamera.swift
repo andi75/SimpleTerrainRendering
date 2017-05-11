@@ -16,7 +16,7 @@ class TerrainCamera {
     {
         didSet(oldValue)// clamp to -5 Pi/12, 5 Pi/12
         {
-            chi = max( -5 * Float(M_PI) / 12, min( chi, 5 * Float(M_PI) / 12) )
+            chi = max( -5 * .pi / 12, min( chi, 5 * .pi / 12) )
         }
     }
     // up-down angle, chi = pi/2 is in z direction
@@ -44,8 +44,8 @@ class TerrainCamera {
     var right : GLKVector3 {
         get {
             return GLKVector3Make(
-                cos(phi - Float(M_PI_2)) * cos(chi),
-                sin(phi - Float(M_PI_2)) * cos(chi),
+                cos(phi - .pi / 2) * cos(chi),
+                sin(phi - .pi / 2) * cos(chi),
                 0
             )
         }
@@ -67,8 +67,8 @@ class TerrainCamera {
     {
         self.terrain = terrain
         self.eye = GLKVector3Make(Float(terrain.rect.width / 2), Float(terrain.rect.height / 2), terrain.maxHeight)
-        self.phi = -3 * Float(M_PI) / 2
-        self.chi = 0 // -Float(M_PI) / 4
+        self.phi = -3 * .pi / 2
+        self.chi = 0 // -.pi / 4
     }
     
     func forwardBackward(_ d : Float)
